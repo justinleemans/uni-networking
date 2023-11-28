@@ -1,0 +1,14 @@
+{
+    "name": "com.justinleemans.networking",
+    "version": "1.0.0",
+    "displayName": "Networking",
+    "description": "Custom Unity networking library",
+    "author": {
+        "name": "Justin Leemans"
+    },
+    "dependencies": {},
+    "keywords": [
+        "networking",
+        "multiplayer"
+    ]
+}
