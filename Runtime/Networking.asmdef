@@ -1,7 +1,9 @@
 {
     "name": "Networking",
     "rootNamespace": "JeeLee.Networking",
-    "references": [],
+    "references": [
+        "GUID:bd259f38b4577d74d84c605058d626fd"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
