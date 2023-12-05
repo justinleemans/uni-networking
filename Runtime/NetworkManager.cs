@@ -17,13 +17,13 @@ namespace JeeLee.Networking
             _transport = transport ?? new TcpTransport();
 
             _signalManager.Subscribe<NetworkSignal>(OnNetworkSignal);
-            _transport.OnMessageReceived = OnNetworkMessageReceived;
+            _transport.OnClientMessageReceived = OnNetworkMessageReceived;
         }
 
         public void Dispose()
         {
             _signalManager.Unsubscribe<NetworkSignal>(OnNetworkSignal);
-            _transport.OnMessageReceived = null;
+            _transport.OnClientMessageReceived = null;
         }
 
         private void OnNetworkSignal(NetworkSignal signal)

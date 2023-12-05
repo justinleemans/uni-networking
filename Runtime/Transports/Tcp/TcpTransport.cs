@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using JeeLee.Networking.Delegates;
 
@@ -6,27 +8,33 @@ namespace JeeLee.Networking.Transports.Tcp
     public class TcpTransport : ITransport
     {
         #region ITransport Members
-        
-        public MessageReceivedHandler OnMessageReceived { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public bool IsConnected => throw new System.NotImplementedException();
-        public bool IsHost => throw new System.NotImplementedException();
 
-        public Task Start()
+        public MessageReceivedHandler OnClientMessageReceived { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public bool IsServerRunning => throw new System.NotImplementedException();
+        public bool IsClientConnected => throw new System.NotImplementedException();
+        public bool IsClientHost => throw new System.NotImplementedException();
+
+        public void ServerStart()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Connect()
+        public void ServerStop()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Disconnect()
+        public void ClientConnect()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Send(byte[] dataBuffer, int length)
+        public void ClientDisconnect()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void ClientSend(byte[] dataBuffer, int length)
         {
             throw new System.NotImplementedException();
         }

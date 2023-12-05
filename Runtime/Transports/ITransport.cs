@@ -5,13 +5,15 @@ namespace JeeLee.Networking.Transports
 {
     public interface ITransport
     {
-        MessageReceivedHandler OnMessageReceived { get; set; }
-        bool IsConnected { get; }
-        bool IsHost { get; }
+        MessageReceivedHandler OnClientMessageReceived { get; set; }
+        bool IsServerRunning { get; }
+        bool IsClientConnected { get; }
+        bool IsClientHost { get; }
 
-        Task Start();
-        Task Connect();
-        Task Disconnect();
-        Task Send(byte[] dataBuffer, int length);
+        void ServerStart();
+        void ServerStop();
+        void ClientConnect();
+        void ClientDisconnect();
+        void ClientSend(byte[] dataBuffer, int length);
     }
 }
