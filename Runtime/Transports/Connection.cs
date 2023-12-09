@@ -13,6 +13,7 @@ namespace JeeLee.Networking.Transports
 
         public abstract void Send(byte[] dataBuffer);
         public abstract void Receive(MessageReceivedHandler handler);
+        public abstract void Close();
 
         public override bool Equals(object obj)
         {

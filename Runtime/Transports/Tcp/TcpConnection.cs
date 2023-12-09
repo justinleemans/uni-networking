@@ -7,7 +7,7 @@ namespace JeeLee.Networking.Transports.Tcp
     public class TcpConnection : Connection
     {
         private readonly Socket _socket;
-        private IPEndPoint _endPoint;
+        private readonly IPEndPoint _endPoint;
 
         public TcpConnection(Socket socket, IPEndPoint endPoint) : base(endPoint.GetHashCode())
         {
@@ -21,6 +21,11 @@ namespace JeeLee.Networking.Transports.Tcp
         }
 
         public override void Receive(MessageReceivedHandler handler)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Close()
         {
             throw new System.NotImplementedException();
         }
