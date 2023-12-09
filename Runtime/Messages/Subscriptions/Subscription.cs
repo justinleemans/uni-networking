@@ -1,0 +1,90 @@
+using System;
+using System.Collections.Generic;
+using JeeLee.Networking.Delegates;
+
+namespace JeeLee.Networking.Messages.Subscriptions
+{
+    public sealed class Subscription<TMessage> : ISubscription
+        where TMessage : IMessage
+    {
+        private readonly HashSet<MessageHandler<TMessage>> _handlers;
+        private readonly List<MessageHandler<TMessage>> _retroAddHandlers;
+        private readonly List<MessageHandler<TMessage>> _retroRemoveHandlers;
+
+        private bool _isProcessing;
+
+        public Subscription()
+        {
+            _handlers = new HashSet<MessageHandler<TMessage>>();
+            _retroAddHandlers = new List<MessageHandler<TMessage>>();
+            _retroRemoveHandlers = new List<MessageHandler<TMessage>>();
+        }
+
+        public void Handler(TMessage message)
+        {
+            _isProcessing = true;
+
+            foreach (var handler in _handlers)
+            {
+                handler?.Invoke(message);
+            }
+
+            _isProcessing = false;
+
+            ProcessHandlerQueues();
+        }
+
+        public void AddHandler(MessageHandler<TMessage> handler)
+        {
+            if (handler == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            if (!_isProcessing)
+            {
+                _handlers.Add(handler);
+            }
+            else
+            {
+                _retroRemoveHandlers.RemoveAll(handle => handle == handler);
+                _retroAddHandlers.Add(handler);
+            }
+        }
+
+        public void RemoveHandler(MessageHandler<TMessage> handler)
+        {
+            if (handler == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            if (!_isProcessing)
+            {
+                _handlers.Remove(handler);
+            }
+            else
+            {
+                _retroAddHandlers.RemoveAll(handle => handle == handler);
+                _retroRemoveHandlers.Add(handler);
+            }
+        }
+
+        private void ProcessHandlerQueues()
+        {
+            foreach (var handler in _retroAddHandlers)
+            {
+                AddHandler(handler);
+            }
+
+            _retroAddHandlers.Clear();
+
+            foreach (var handler in _retroRemoveHandlers)
+            {
+                RemoveHandler(handler);
+            }
+
+            _retroRemoveHandlers.Clear();
+        }
+    }
+}
