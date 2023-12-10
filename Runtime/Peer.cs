@@ -46,8 +46,8 @@ namespace JeeLee.Networking
         public void SendMessage<TMessage>(TMessage message)
             where TMessage : Message
         {
-            var isServerRunning = _transport is IServerTransport server && !server.IsRunning;
-            var isClientConnected = _transport is IClientTransport client && !client.IsConnected;
+            var isServerRunning = _transport is IServerTransport server && server.IsRunning;
+            var isClientConnected = _transport is IClientTransport client && client.IsConnected;
             
             if(isServerRunning || isClientConnected)
             {
@@ -87,8 +87,8 @@ namespace JeeLee.Networking
 
         public void Tick()
         {
-            var isServerRunning = _transport is IServerTransport server && !server.IsRunning;
-            var isClientConnected = _transport is IClientTransport client && !client.IsConnected;
+            var isServerRunning = _transport is IServerTransport server && server.IsRunning;
+            var isClientConnected = _transport is IClientTransport client && client.IsConnected;
             
             if(!isServerRunning && !isClientConnected)
             {
