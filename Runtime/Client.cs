@@ -16,13 +16,23 @@ namespace JeeLee.Networking
             _transport = transport;
         }
 
-        public bool Connect()
+        public bool Connect(string remoteAddress, ushort port)
         {
-            return _transport.Connect();
+            if (_transport.IsConnected)
+            {
+                _transport.Disconnect();
+            }
+            
+            return _transport.Connect(remoteAddress, port);
         }
 
         public void Disconnect()
         {
+            if (!_transport.IsConnected)
+            {
+                return;
+            }
+            
             _transport.Disconnect();
         }
     }

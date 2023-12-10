@@ -16,13 +16,23 @@ namespace JeeLee.Networking
             _transport = transport;
         }
 
-        public void Start()
+        public void Start(ushort port)
         {
-            _transport.Start();
+            if (_transport.IsRunning)
+            {
+                _transport.Stop();
+            }
+
+            _transport.Start(port);
         }
 
         public void Stop()
         {
+            if (!_transport.IsRunning)
+            {
+                return;
+            }
+            
             _transport.Stop();
         }
     }

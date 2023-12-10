@@ -12,14 +12,9 @@ namespace JeeLee.Networking.Transports.Tcp
         public Connection Connection { get; private set; }
         public bool IsConnected { get; private set; }
 
-        public bool Connect()
+        public bool Connect(string remoteAddress, ushort port)
         {
-            if (IsConnected)
-            {
-                Disconnect();
-            }
-
-            IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7777);
+            IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse(remoteAddress), port);
             _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             _socket.Connect(remoteEndPoint);
 
@@ -37,21 +32,11 @@ namespace JeeLee.Networking.Transports.Tcp
 
         public void Send(byte[] dataBuffer)
         {
-            if (!IsConnected)
-            {
-                return;
-            }
-
             Connection.Send(dataBuffer);
         }
 
         public void Tick()
         {
-            if (!IsConnected)
-            {
-                return;
-            }
-
             Connection.Receive(OnMessageReceived);
         }
     }

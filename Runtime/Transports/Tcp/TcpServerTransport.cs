@@ -13,25 +13,28 @@ namespace JeeLee.Networking.Transports.Tcp
         public HashSet<Connection> Connections { get; private set; }
         public bool IsRunning { get; private set; }
 
-        public void Start()
+        public void Start(ushort port)
         {
             Connections = new HashSet<Connection>();
-            StartListening();
+            
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.IPv6Any, port);
+            _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            _socket.Bind(localEndPoint);
+            _socket.Listen(2);
+
+            IsRunning = true;
         }
 
         public void Stop()
         {
-            StopListening();
+            IsRunning = false;
+            _socket.Close();
+
             Connections.Clear();
         }
 
         public void Send(byte[] dataBuffer)
         {
-            if (!IsRunning)
-            {
-                return;
-            }
-
             foreach (var connection in Connections)
             {
                 connection.Send(dataBuffer);
@@ -40,11 +43,6 @@ namespace JeeLee.Networking.Transports.Tcp
 
         public void Tick()
         {
-            if (!IsRunning)
-            {
-                return;
-            }
-
             if (_socket.Poll(0, SelectMode.SelectRead))
             {
                 Socket connectionSocket = _socket.Accept();
@@ -61,32 +59,6 @@ namespace JeeLee.Networking.Transports.Tcp
             {
                 connection.Receive(OnMessageReceived);
             }
-        }
-
-        private void StartListening()
-        {
-            if (IsRunning)
-            {
-                StopListening();
-            }
-
-            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7777);
-            _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            _socket.Bind(localEndPoint);
-            _socket.Listen(2);
-
-            IsRunning = true;
-        }
-
-        private void StopListening()
-        {
-            if (!IsRunning)
-            {
-                return;
-            }
-
-            IsRunning = false;
-            _socket.Close();
         }
     }
 }

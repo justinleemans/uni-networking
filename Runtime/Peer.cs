@@ -42,7 +42,14 @@ namespace JeeLee.Networking
         public void SendMessage<TMessage>(TMessage message)
             where TMessage : Message
         {
-            _transport.Send(message.ReadMessageData());
+            var isServerRunning = _transport is IServerTransport server && !server.IsRunning;
+            var isClientConnected = _transport is IClientTransport client && !client.IsConnected;
+            
+            if(isServerRunning || isClientConnected)
+            {
+                _transport.Send(message.ReadMessageData());
+            }
+            
             AllocateMessagePool<TMessage>().Release(message);
         }
 
@@ -76,6 +83,14 @@ namespace JeeLee.Networking
 
         public void Tick()
         {
+            var isServerRunning = _transport is IServerTransport server && !server.IsRunning;
+            var isClientConnected = _transport is IClientTransport client && !client.IsConnected;
+            
+            if(!isServerRunning && !isClientConnected)
+            {
+                return;
+            }
+
             _transport.Tick();
         }
 
