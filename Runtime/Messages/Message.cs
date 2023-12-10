@@ -10,6 +10,7 @@ namespace JeeLee.Networking.Messages
 
         public void Clear()
         {
+            OnClear();
         }
 
         #endregion

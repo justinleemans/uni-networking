@@ -30,6 +30,10 @@ namespace JeeLee.Networking
 
         public void Dispose()
         {
+            _messagePools.Clear();
+            _messageSubscriptions.Clear();
+            _messageIdMap.Clear();
+            
             _transport.OnMessageReceived = null;
         }
 
@@ -136,7 +140,7 @@ namespace JeeLee.Networking
         {
             if (!_messageIdMap.TryGetValue(messageId, out var messageType))
             {
-                _messageIdMap.Add(messageId, typeof(TMessage));
+                _messageIdMap.Add(messageId, messageType = typeof(TMessage));
             }
 
             return typeof(TMessage) == messageType;
