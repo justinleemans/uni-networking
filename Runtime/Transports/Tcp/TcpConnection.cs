@@ -27,7 +27,7 @@ namespace JeeLee.Networking.Transports.Tcp
 
         public override void Close()
         {
-            throw new System.NotImplementedException();
+            _socket.Close();
         }
     }
 }

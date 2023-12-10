@@ -51,7 +51,7 @@ namespace JeeLee.Networking.Transports.Tcp
 
                 if (!Connections.Add(acceptedConnection))
                 {
-                    connectionSocket.Close();
+                    acceptedConnection.Close();
                 }
             }
 
