@@ -15,17 +15,17 @@ namespace JeeLee.Networking.Transports.Tcp
             _endPoint = endPoint;
         }
 
-        public override void Send(byte[] dataBuffer)
+        protected override void OnSend(int messageId, byte[] dataStream)
         {
             throw new System.NotImplementedException();
         }
 
-        public override void Receive(MessageReceivedHandler handler)
+        protected override void OnReceive(out int messageId, out byte[] dataStream)
         {
             throw new System.NotImplementedException();
         }
 
-        public override void Close()
+        protected override void OnClose()
         {
             _socket.Close();
         }

@@ -1,4 +1,5 @@
 using JeeLee.Networking.Delegates;
+using JeeLee.Networking.Messages;
 
 namespace JeeLee.Networking.Transports
 {
@@ -11,9 +12,21 @@ namespace JeeLee.Networking.Transports
             _networkIdentifier = networkIdentifier;
         }
 
-        public abstract void Send(byte[] dataBuffer);
-        public abstract void Receive(MessageReceivedHandler handler);
-        public abstract void Close();
+        public void Send(Message message)
+        {
+            OnSend(message.InternalId, message.ReadMessageData());
+        }
+
+        public void Receive(MessageReceivedHandler handler)
+        {
+            OnReceive(out int messageId, out byte[] dataStream);
+            handler(messageId, dataStream);
+        }
+
+        public void Close()
+        {
+            OnClose();
+        }
 
         public override bool Equals(object obj)
         {
@@ -29,5 +42,9 @@ namespace JeeLee.Networking.Transports
         {
             return _networkIdentifier.GetHashCode();
         }
+
+        protected abstract void OnSend(int messageId, byte[] dataStream);
+        protected abstract void OnReceive(out int messageId, out byte[] dataStream);
+        protected abstract void OnClose();
     }
 }

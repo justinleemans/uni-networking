@@ -25,9 +25,9 @@ namespace JeeLee.Networking.Messages
             return stream.ToArray();
         }
 
-        public void WriteMessageData(byte[] dataBuffer)
+        public void WriteMessageData(byte[] dataStream)
         {
-            using MemoryStream stream = new MemoryStream(dataBuffer);
+            using MemoryStream stream = new MemoryStream(dataStream);
             using BinaryReader reader = new BinaryReader(stream);
 
             Deserialize(reader);

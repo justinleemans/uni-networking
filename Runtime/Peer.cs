@@ -51,7 +51,7 @@ namespace JeeLee.Networking
             
             if(isServerRunning || isClientConnected)
             {
-                _transport.Send(message.ReadMessageData());
+                _transport.Send(message);
             }
             
             AllocateMessagePool<TMessage>().Release(message);
@@ -98,7 +98,7 @@ namespace JeeLee.Networking
             _transport.Tick();
         }
 
-        private void OnMessageReceived(int messageId, byte[] dataBuffer, int length)
+        private void OnMessageReceived(int messageId, byte[] dataStream)
         {
             if (!_messageIdMap.TryGetValue(messageId, out var messageType))
             {

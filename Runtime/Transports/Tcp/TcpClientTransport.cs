@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using JeeLee.Networking.Delegates;
+using JeeLee.Networking.Messages;
 
 namespace JeeLee.Networking.Transports.Tcp
 {
@@ -30,9 +31,9 @@ namespace JeeLee.Networking.Transports.Tcp
             Connection = null;
         }
 
-        public void Send(byte[] dataBuffer)
+        public void Send(Message message)
         {
-            Connection.Send(dataBuffer);
+            Connection.Send(message);
         }
 
         public void Tick()
