@@ -1,4 +1,6 @@
+using System;
 using JeeLee.Networking.Delegates;
+using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
 
 namespace JeeLee.Networking.Transports
@@ -14,13 +16,27 @@ namespace JeeLee.Networking.Transports
 
         public void Send(Message message)
         {
-            OnSend(message.InternalId, message.ReadMessageData());
+            try
+            {
+                OnSend(message.InternalId, message.ReadMessageData());
+            }
+            catch (Exception exception)
+            {
+                throw new TransportException("Error trying to send message", exception);
+            }
         }
 
         public void Receive(MessageReceivedHandler handler)
         {
-            OnReceive(out int messageId, out byte[] dataStream);
-            handler(messageId, dataStream);
+            try
+            {
+                OnReceive(out int messageId, out byte[] dataStream);
+                handler(messageId, dataStream);
+            }
+            catch (Exception exception)
+            {
+                throw new TransportException("Error trying to recieve message data", exception);
+            }
         }
 
         public void Close()
