@@ -20,7 +20,7 @@ namespace JeeLee.Networking.Messages
             using MemoryStream stream = new MemoryStream();
             using BinaryWriter writer = new BinaryWriter(stream);
 
-            InternalSerialize(writer);
+            Serialize(writer);
 
             return stream.ToArray();
         }
@@ -30,7 +30,7 @@ namespace JeeLee.Networking.Messages
             using MemoryStream stream = new MemoryStream(dataBuffer);
             using BinaryReader reader = new BinaryReader(stream);
 
-            InternalDeserialize(reader);
+            Deserialize(reader);
         }
 
         protected abstract void Serialize(BinaryWriter writer);
@@ -38,18 +38,6 @@ namespace JeeLee.Networking.Messages
 
         protected virtual void OnClear()
         {
-        }
-
-        private void InternalSerialize(BinaryWriter writer)
-        {
-            writer.Write(InternalId);
-            Serialize(writer);
-        }
-
-        private void InternalDeserialize(BinaryReader reader)
-        {
-            Deserialize(reader);
-            reader.ReadInt32();
         }
     }
 }
