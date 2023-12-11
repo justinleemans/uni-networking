@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Sockets;
-using JeeLee.Networking.Delegates;
 
 namespace JeeLee.Networking.Transports.Tcp
 {

@@ -14,14 +14,14 @@ namespace JeeLee.Networking.Transports.Tcp
         public HashSet<Connection> Connections { get; private set; }
         public bool IsRunning { get; private set; }
 
-        public void Start(ushort port)
+        public void Start(ushort port, int maxConnections)
         {
             Connections = new HashSet<Connection>();
             
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.IPv6Any, port);
             _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             _socket.Bind(localEndPoint);
-            _socket.Listen(2);
+            _socket.Listen(maxConnections);
 
             IsRunning = true;
         }
