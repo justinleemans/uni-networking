@@ -7,7 +7,9 @@ namespace JeeLee.Networking.Transports
     {
         MessageReceivedHandler OnMessageReceived { get; set; }
 
-        void Send(Message message);
+        void Send<TMessage>(TMessage message)
+            where TMessage : Message;
+            
         void Tick();
     }
 }

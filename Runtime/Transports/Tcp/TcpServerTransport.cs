@@ -34,7 +34,8 @@ namespace JeeLee.Networking.Transports.Tcp
             Connections.Clear();
         }
 
-        public void Send(Message message)
+        public void Send<TMessage>(TMessage message)
+            where TMessage : Message
         {
             foreach (var connection in Connections)
             {

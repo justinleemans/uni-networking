@@ -31,7 +31,8 @@ namespace JeeLee.Networking.Transports.Tcp
             Connection = null;
         }
 
-        public void Send(Message message)
+        public void Send<TMessage>(TMessage message)
+            where TMessage : Message
         {
             Connection.Send(message);
         }

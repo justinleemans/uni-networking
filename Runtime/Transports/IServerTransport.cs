@@ -8,6 +8,7 @@ namespace JeeLee.Networking.Transports
         bool IsRunning { get; }
 
         void Start(ushort port, int maxConnections);
+        
         void Stop();
     }
 }

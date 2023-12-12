@@ -14,11 +14,12 @@ namespace JeeLee.Networking.Transports
             _networkIdentifier = networkIdentifier;
         }
 
-        public void Send(Message message)
+        public void Send<TMessage>(TMessage message)
+            where TMessage : Message
         {
             try
             {
-                OnSend(message.InternalId, message.ReadMessageData());
+                OnSend(message.InternalId, message.DataStream);
             }
             catch (Exception exception)
             {
