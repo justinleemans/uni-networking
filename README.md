@@ -1,6 +1,6 @@
-# Networking - Custom Unity networking framework
+# Networking - Event based networking solution for Unity
 
-A custom networking solution based aroung a signals architechture. Uses my custom signals library for simplified communications.
+A custom networking solution based aroung a signals architechture from my library [justinleemans/signals](https://github.com/justinleemans/signals).
 
 # Table of Contents
 
@@ -13,6 +13,9 @@ A custom networking solution based aroung a signals architechture. Uses my custo
 Currently the best way to include this package in your project is through the unity package manager. Add the package using the git URL of this repo: https://github.com/justinleemans/networking
 
 # Quick Start
+
+> [!NOTE]
+> The quick start guide is not finished and will be added later.
 
 # Contributing
 
