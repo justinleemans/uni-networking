@@ -2,25 +2,38 @@ using System;
 using System.Collections.Generic;
 using JeeLee.Networking.Delegates;
 
-namespace JeeLee.Networking.Messages.Subscriptions
+namespace JeeLee.Networking.Messages
 {
-    public sealed class Subscription<TMessage> : ISubscription
+    public sealed class MessageRegistry<TMessage> : IMessageRegistry
         where TMessage : IMessage
     {
+        private readonly Queue<TMessage> _pool;
         private readonly HashSet<MessageHandler<TMessage>> _handlers;
         private readonly List<MessageHandler<TMessage>> _retroAddHandlers;
         private readonly List<MessageHandler<TMessage>> _retroRemoveHandlers;
 
         private bool _isProcessing;
 
-        public Subscription()
+        public MessageRegistry()
         {
+            _pool = new Queue<TMessage>();
             _handlers = new HashSet<MessageHandler<TMessage>>();
             _retroAddHandlers = new List<MessageHandler<TMessage>>();
             _retroRemoveHandlers = new List<MessageHandler<TMessage>>();
         }
 
-        public void Handler(TMessage message)
+        public TMessage GetMessage()
+        {
+            return _pool.Count > 0 ? _pool.Dequeue() : Activator.CreateInstance<TMessage>();
+        }
+
+        public void ReleaseMessage(TMessage message)
+        {
+            message.Clear();
+            _pool.Enqueue(message);
+        }
+
+        public void Handle(TMessage message)
         {
             _isProcessing = true;
 

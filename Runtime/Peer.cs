@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using JeeLee.Networking.Delegates;
 using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
-using JeeLee.Networking.Messages.Pooling;
-using JeeLee.Networking.Messages.Subscriptions;
 using JeeLee.Networking.Transports;
 
 namespace JeeLee.Networking
@@ -13,16 +11,14 @@ namespace JeeLee.Networking
     {
         private readonly ITransport _transport;
 
-        private readonly Dictionary<Type, IPool> _messagePools;
-        private readonly Dictionary<Type, ISubscription> _messageSubscriptions;
+        private readonly Dictionary<Type, IMessageRegistry> _messageRegistries;
         private readonly Dictionary<int, Type> _messageIdMap;
 
         protected Peer(ITransport transport)
         {
             _transport = transport;
 
-            _messagePools = new Dictionary<Type, IPool>();
-            _messageSubscriptions = new Dictionary<Type, ISubscription>();
+            _messageRegistries = new Dictionary<Type, IMessageRegistry>();
             _messageIdMap = new Dictionary<int, Type>();
 
             _transport.OnMessageReceived = OnMessageReceived;
@@ -30,10 +26,6 @@ namespace JeeLee.Networking
 
         public void Dispose()
         {
-            _messagePools.Clear();
-            _messageSubscriptions.Clear();
-            _messageIdMap.Clear();
-            
             _transport.OnMessageReceived = null;
         }
 
@@ -54,13 +46,13 @@ namespace JeeLee.Networking
                 _transport.Send(message);
             }
             
-            AllocateMessagePool<TMessage>().Release(message);
+            AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
 
         public TMessage GetMessage<TMessage>()
             where TMessage : Message
         {
-            return AllocateMessagePool<TMessage>().Get();
+            return AllocateMessageRegistry<TMessage>().GetMessage();
         }
 
         public void Subscribe<TMessage>(int messageId, MessageHandler<TMessage> handler)
@@ -71,7 +63,7 @@ namespace JeeLee.Networking
                 throw new InvalidBindException();
             }
 
-            AllocateMessageSubscription<TMessage>().AddHandler(handler);
+            AllocateMessageRegistry<TMessage>().AddHandler(handler);
         }
 
         public void Unsubscribe<TMessage>(int messageId, MessageHandler<TMessage> handler)
@@ -82,7 +74,7 @@ namespace JeeLee.Networking
                 throw new InvalidBindException();
             }
 
-            AllocateMessageSubscription<TMessage>().RemoveHandler(handler);
+            AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
         }
 
         public void Tick()
@@ -100,39 +92,18 @@ namespace JeeLee.Networking
 
         private void OnMessageReceived(int messageId, byte[] dataStream)
         {
-            if (!_messageIdMap.TryGetValue(messageId, out var messageType))
-            {
-                return;
-            }
-
-            if (!_messageSubscriptions.TryGetValue(messageType, out var subscription))
-            {
-                return;
-            }
-
             throw new NotImplementedException();
         }
 
-        private Pool<TMessage> AllocateMessagePool<TMessage>()
+        private MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
             where TMessage : Message
         {
-            if (!_messagePools.TryGetValue(typeof(TMessage), out var pool))
+            if (!_messageRegistries.TryGetValue(typeof(TMessage), out var registry))
             {
-                _messagePools.Add(typeof(TMessage), pool = new Pool<TMessage>());
+                _messageRegistries.Add(typeof(TMessage), registry = new MessageRegistry<TMessage>());
             }
 
-            return (Pool<TMessage>)pool;
-        }
-
-        private Subscription<TMessage> AllocateMessageSubscription<TMessage>()
-            where TMessage : Message
-        {
-            if (!_messageSubscriptions.TryGetValue(typeof(TMessage), out var subscription))
-            {
-                _messageSubscriptions.Add(typeof(TMessage), subscription = new Subscription<TMessage>());
-            }
-
-            return (Subscription<TMessage>)subscription;
+            return (MessageRegistry<TMessage>)registry;
         }
 
         private bool TryBindMessageId<TMessage>(int messageId)
