@@ -1,4 +1,6 @@
+using JeeLee.Networking.Messages.Streams;
+
 namespace JeeLee.Networking.Messages.Delegates
 {
-    public delegate void MessageReceivedHandler(int messageId, byte[] dataBuffer);
+    public delegate void MessageReceivedHandler(DataStream dataStream);
 }

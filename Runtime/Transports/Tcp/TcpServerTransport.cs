@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using JeeLee.Networking.Messages;
 using JeeLee.Networking.Messages.Delegates;
+using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Transports.Tcp
 {
@@ -34,12 +35,11 @@ namespace JeeLee.Networking.Transports.Tcp
             Connections.Clear();
         }
 
-        public void Send<TMessage>(TMessage message)
-            where TMessage : Message
+        public void Send(DataStream dataStream)
         {
             foreach (var connection in Connections)
             {
-                connection.Send(message);
+                connection.Send(dataStream);
             }
         }
 

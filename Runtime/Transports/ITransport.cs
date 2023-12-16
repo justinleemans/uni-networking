@@ -1,5 +1,5 @@
-using JeeLee.Networking.Messages;
 using JeeLee.Networking.Messages.Delegates;
+using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Transports
 {
@@ -7,9 +7,7 @@ namespace JeeLee.Networking.Transports
     {
         MessageReceivedHandler OnMessageReceived { get; set; }
 
-        void Send<TMessage>(TMessage message)
-            where TMessage : Message;
-            
+        void Send(DataStream dataStream);
         void Tick();
     }
 }

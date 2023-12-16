@@ -2,6 +2,7 @@ using System;
 using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
 using JeeLee.Networking.Messages.Delegates;
+using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Transports
 {
@@ -14,12 +15,11 @@ namespace JeeLee.Networking.Transports
             _networkIdentifier = networkIdentifier;
         }
 
-        public void Send<TMessage>(TMessage message)
-            where TMessage : Message
+        public void Send(DataStream dataStream)
         {
             try
             {
-                // OnSend(message.InternalId, message.DataStream);
+                OnSend(dataStream.GetBytes());
             }
             catch (Exception exception)
             {
@@ -31,8 +31,15 @@ namespace JeeLee.Networking.Transports
         {
             try
             {
-                OnReceive(out int messageId, out byte[] dataStream);
-                handler(messageId, dataStream);
+                OnReceive(out byte[] dataBuffer);
+
+                if (dataBuffer == null || dataBuffer.Length < sizeof(int))
+                {
+                    return;
+                }
+
+                DataStream dataStream = new DataStream(dataBuffer);
+                handler(dataStream);
             }
             catch (Exception exception)
             {
@@ -60,8 +67,8 @@ namespace JeeLee.Networking.Transports
             return _networkIdentifier.GetHashCode();
         }
 
-        protected abstract void OnSend(int messageId, byte[] dataStream);
-        protected abstract void OnReceive(out int messageId, out byte[] dataStream);
+        protected abstract void OnSend(byte[] dataBuffer);
+        protected abstract void OnReceive(out byte[] dataBuffer);
         protected abstract void OnClose();
     }
 }

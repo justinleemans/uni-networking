@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JeeLee.Networking.Messages.Delegates;
+using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Messages
 {
@@ -33,9 +34,12 @@ namespace JeeLee.Networking.Messages
             _pool.Enqueue(message);
         }
 
-        public void Handle(TMessage message)
+        public void Handle(DataStream dataStream)
         {
             _isProcessing = true;
+
+            TMessage message = GetMessage();
+            message.DataStream = dataStream;
 
             foreach (var handler in _handlers)
             {

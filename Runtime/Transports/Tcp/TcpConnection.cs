@@ -6,20 +6,18 @@ namespace JeeLee.Networking.Transports.Tcp
     public class TcpConnection : Connection
     {
         private readonly Socket _socket;
-        private readonly IPEndPoint _endPoint;
 
         public TcpConnection(Socket socket, IPEndPoint endPoint) : base(endPoint.GetHashCode())
         {
             _socket = socket;
-            _endPoint = endPoint;
         }
 
-        protected override void OnSend(int messageId, byte[] dataStream)
+        protected override void OnSend(byte[] dataBuffer)
         {
             throw new System.NotImplementedException();
         }
 
-        protected override void OnReceive(out int messageId, out byte[] dataStream)
+        protected override void OnReceive(out byte[] dataBuffer)
         {
             throw new System.NotImplementedException();
         }

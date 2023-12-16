@@ -5,6 +5,7 @@ using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
 using JeeLee.Networking.Messages.Attributes;
 using JeeLee.Networking.Messages.Delegates;
+using JeeLee.Networking.Messages.Streams;
 using JeeLee.Networking.Transports;
 
 namespace JeeLee.Networking
@@ -45,7 +46,11 @@ namespace JeeLee.Networking
             
             if(isServerRunning || isClientConnected)
             {
-                _transport.Send(message);
+                int messageId = RegisterMessageId<TMessage>();
+                DataStream dataStream = message.DataStream;
+                dataStream.Sign(messageId);
+
+                _transport.Send(dataStream);
             }
             
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
@@ -82,9 +87,16 @@ namespace JeeLee.Networking
             _transport.Tick();
         }
 
-        private void OnMessageReceived(int messageId, byte[] dataStream)
+        private void OnMessageReceived(DataStream dataStream)
         {
-            throw new NotImplementedException();
+            int messageId = dataStream.ReadInt();
+
+            if (!_messageRegistries.TryGetValue(messageId, out var registry))
+            {
+                return;
+            }
+
+            registry.Handle(dataStream);
         }
 
         private MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
