@@ -1,5 +1,5 @@
-using JeeLee.Networking.Delegates;
 using JeeLee.Networking.Messages;
+using JeeLee.Networking.Messages.Delegates;
 
 namespace JeeLee.Networking.Transports
 {

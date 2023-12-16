@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using JeeLee.Networking.Delegates;
 using JeeLee.Networking.Messages;
+using JeeLee.Networking.Messages.Delegates;
 
 namespace JeeLee.Networking.Transports.Tcp
 {

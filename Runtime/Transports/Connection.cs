@@ -1,7 +1,7 @@
 using System;
-using JeeLee.Networking.Delegates;
 using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
+using JeeLee.Networking.Messages.Delegates;
 
 namespace JeeLee.Networking.Transports
 {
@@ -19,7 +19,7 @@ namespace JeeLee.Networking.Transports
         {
             try
             {
-                OnSend(message.InternalId, message.DataStream);
+                // OnSend(message.InternalId, message.DataStream);
             }
             catch (Exception exception)
             {

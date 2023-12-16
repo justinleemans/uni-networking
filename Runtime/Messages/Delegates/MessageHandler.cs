@@ -1,6 +1,4 @@
-using JeeLee.Networking.Messages;
-
-namespace JeeLee.Networking.Delegates
+namespace JeeLee.Networking.Messages.Delegates
 {
     public delegate void MessageHandler<in TMessage>(TMessage message)
         where TMessage : IMessage;

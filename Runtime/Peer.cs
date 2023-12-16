@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
-using JeeLee.Networking.Delegates;
+using System.Reflection;
 using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
+using JeeLee.Networking.Messages.Attributes;
+using JeeLee.Networking.Messages.Delegates;
 using JeeLee.Networking.Transports;
 
 namespace JeeLee.Networking
@@ -11,15 +13,15 @@ namespace JeeLee.Networking
     {
         private readonly ITransport _transport;
 
-        private readonly Dictionary<Type, IMessageRegistry> _messageRegistries;
-        private readonly Dictionary<int, Type> _messageIdMap;
+        private readonly Dictionary<int, IMessageRegistry> _messageRegistries;
+        private readonly Dictionary<Type, int> _messageIdMap;
 
         protected Peer(ITransport transport)
         {
             _transport = transport;
 
-            _messageRegistries = new Dictionary<Type, IMessageRegistry>();
-            _messageIdMap = new Dictionary<int, Type>();
+            _messageRegistries = new Dictionary<int, IMessageRegistry>();
+            _messageIdMap = new Dictionary<Type, int>();
 
             _transport.OnMessageReceived = OnMessageReceived;
         }
@@ -55,25 +57,15 @@ namespace JeeLee.Networking
             return AllocateMessageRegistry<TMessage>().GetMessage();
         }
 
-        public void Subscribe<TMessage>(int messageId, MessageHandler<TMessage> handler)
+        public void Subscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
-            if (!TryBindMessageId<TMessage>(messageId))
-            {
-                throw new InvalidBindException();
-            }
-
             AllocateMessageRegistry<TMessage>().AddHandler(handler);
         }
 
-        public void Unsubscribe<TMessage>(int messageId, MessageHandler<TMessage> handler)
+        public void Unsubscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
-            if (!TryBindMessageId<TMessage>(messageId))
-            {
-                throw new InvalidBindException();
-            }
-
             AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
         }
 
@@ -98,23 +90,32 @@ namespace JeeLee.Networking
         private MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
             where TMessage : Message
         {
-            if (!_messageRegistries.TryGetValue(typeof(TMessage), out var registry))
+            int messageId = RegisterMessageId<TMessage>();
+            
+            if (!_messageRegistries.TryGetValue(messageId, out var registry))
             {
-                _messageRegistries.Add(typeof(TMessage), registry = new MessageRegistry<TMessage>());
+                _messageRegistries.Add(messageId, registry = new MessageRegistry<TMessage>());
             }
 
             return (MessageRegistry<TMessage>)registry;
         }
 
-        private bool TryBindMessageId<TMessage>(int messageId)
+        private int RegisterMessageId<TMessage>()
             where TMessage : Message
         {
-            if (!_messageIdMap.TryGetValue(messageId, out var messageType))
+            if (!_messageIdMap.TryGetValue(typeof(TMessage), out var messageId))
             {
-                _messageIdMap.Add(messageId, messageType = typeof(TMessage));
+                MessageAttribute messageAttribute = typeof(TMessage).GetCustomAttribute(typeof(MessageAttribute)) as MessageAttribute;
+
+                if (messageAttribute == null)
+                {
+                    throw new InvalidBindException();
+                }
+
+                _messageIdMap.Add(typeof(TMessage), messageId = messageAttribute.MessageId);
             }
 
-            return typeof(TMessage) == messageType;
+            return messageId;
         }
     }
 }

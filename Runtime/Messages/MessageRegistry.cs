@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using JeeLee.Networking.Delegates;
+using JeeLee.Networking.Messages.Delegates;
 
 namespace JeeLee.Networking.Messages
 {
