@@ -2,6 +2,20 @@
 
 A custom networking solution based around a signals architechture from my library [justinleemans/signals](https://github.com/justinleemans/signals).
 
+# Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+    - [Running a server](#running-a-server)
+    - [Connecting a client](#connecting-a-client)
+    - [Running the update loop](#running-the-update-loop)
+    - [Creating messages](#creating-messages)
+    - [Sending messages](#sending-messages)
+    - [Receiving messages](#receiving-messages)
+- [Transports](#transports)
+    - [Creating a custom transport](#creating-a-custom-transport)
+- [Contributing](#contributing)
+
 # Installation
 
 Currently the best way to include this package in your project is through the unity package manager. Add the package using the git URL of this repo: https://github.com/justinleemans/networking
@@ -54,6 +68,10 @@ client.Connect("127.0.0.1", 7777); // Connects to a local server running on port
 ...
 client.Disconnect(); // Disconnects from the previous connected server
 ```
+
+## Running the update loop
+
+To make sure your peer is receiving all communications and managing all connections you have to consistently update the peer by calling the `Tick()` method. This goes for both server and client. It is recommended to call this method from the `FixedUpdate()` method on a MonBehaviour or through a similar approach. This is because you don't want you communications to be framerate dependant.
 
 ## Creating messages
 
