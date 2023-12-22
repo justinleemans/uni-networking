@@ -7,6 +7,8 @@ namespace JeeLee.Networking
     {
         private readonly IClientTransport _transport;
         
+        public bool IsConnected => _transport.IsConnected;
+
         public Client() : this(new TcpClientTransport())
         {
         }

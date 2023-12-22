@@ -7,6 +7,8 @@ namespace JeeLee.Networking
     {
         private readonly IServerTransport _transport;
         
+        public bool IsRunning => _transport.IsRunning;
+
         public Server() : this(new TcpServerTransport())
         {
         }
