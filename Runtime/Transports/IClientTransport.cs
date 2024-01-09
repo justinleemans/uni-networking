@@ -5,7 +5,7 @@ namespace JeeLee.Networking.Transports
         Connection Connection { get; }
         bool IsConnected { get; }
 
-        bool Connect(string remoteAddress, ushort port);
+        bool Connect();
         
         void Disconnect();
     }

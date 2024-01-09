@@ -7,7 +7,7 @@ namespace JeeLee.Networking.Transports
         HashSet<Connection> Connections { get; }
         bool IsRunning { get; }
 
-        void Start(ushort port, int maxConnections);
+        void Start();
         
         void Stop();
     }
