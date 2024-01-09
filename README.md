@@ -39,12 +39,25 @@ Server server = new Server();
 Server server = new Server(new TcpServerTransport());
 ```
 
+The connection details are part of the transport and can be set through properties when initializing or before starting the server.
+
+```c#
+IServerTransport transport = new TcpServerTransport()
+{
+    Port = 7777,
+    MaxConnections = 10,
+}
+
+transport.Port = 7777;
+transport.MaxConnections = 10;
+```
+
 Once you have your server instance you can start the server. Simply call the method `Start()` with the port you want to start on and the max amount of connections as parameters.
 
 If you want to stop the server again simply call `Stop()`.
 
 ```c#
-server.Start(7777, 10); // Starts a server on port 7777 with a maximum of 10 connections
+server.Start(); // Starts a server on port 7777 with a maximum of 10 connections
 ...
 server.Stop(); // Stops the server and closes all connections
 ```
@@ -59,12 +72,25 @@ Client client = new Client();
 Client client = new Client(new TcpClientTransport());
 ```
 
+Just like with the server transport the connection details can be set on the transport when initializing or before connection.
+
+```c#
+IClientTransport transport = new TcpClientTransport()
+{
+    IpAddress = "127.0.0.1",
+    Port = 7777,
+}
+
+transport.IpAddress = "127.0.0.1";
+transport.Port = 7777;
+```
+
 Once you have your instance you can start connecting to a server. For this you can call the method `Connect()` with parameters for the ip address and port of the server.
 
 If you want to disconnect your client you can call `Disconnect()`.
 
 ```c#
-client.Connect("127.0.0.1", 7777); // Connects to a local server running on port 7777
+client.Connect(); // Connects to a local server running on port 7777
 ...
 client.Disconnect(); // Disconnects from the previous connected server
 ```
