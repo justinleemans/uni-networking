@@ -24,12 +24,12 @@ namespace JeeLee.Networking
             _messageRegistries = new Dictionary<int, IMessageRegistry>();
             _messageIdMap = new Dictionary<Type, int>();
 
-            _transport.OnMessageReceived = OnMessageReceived;
+            _transport.OnMessageReceived += OnMessageReceived;
         }
 
         public void Dispose()
         {
-            _transport.OnMessageReceived = null;
+            _transport.OnMessageReceived -= OnMessageReceived;
         }
 
         public void SendMessage<TMessage>()

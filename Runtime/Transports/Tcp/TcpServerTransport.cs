@@ -8,12 +8,13 @@ namespace JeeLee.Networking.Transports.Tcp
 {
     public class TcpServerTransport : IServerTransport
     {
+        public event MessageReceivedHandler OnMessageReceived;
+        
         private Socket _socket;
 
         public ushort Port { get; set; } = 7777;
         public int MaxConnections { get; set; } = 10;
 
-        public MessageReceivedHandler OnMessageReceived { get; set; }
         public HashSet<Connection> Connections { get; private set; }
         public bool IsRunning { get; private set; }
 

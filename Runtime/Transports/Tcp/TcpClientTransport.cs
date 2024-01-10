@@ -7,12 +7,13 @@ namespace JeeLee.Networking.Transports.Tcp
 {
     public class TcpClientTransport : IClientTransport
     {
+        public event MessageReceivedHandler OnMessageReceived;
+        
         private Socket _socket;
 
         public string IpAddress { get; set; } = "127.0.0.1";
         public ushort Port { get; set; } = 7777;
 
-        public MessageReceivedHandler OnMessageReceived { get; set; }
         public Connection Connection { get; private set; }
         public bool IsConnected { get; private set; }
 

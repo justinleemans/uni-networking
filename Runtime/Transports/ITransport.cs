@@ -5,7 +5,7 @@ namespace JeeLee.Networking.Transports
 {
     public interface ITransport
     {
-        MessageReceivedHandler OnMessageReceived { get; set; }
+        event MessageReceivedHandler OnMessageReceived;
 
         void Send(DataStream dataStream);
         void Tick();
