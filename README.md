@@ -13,6 +13,7 @@ A custom networking solution based around a signals architechture from my librar
     - [Sending messages](#sending-messages)
     - [Receiving messages](#receiving-messages)
 - [Transports](#transports)
+    - [Tcp transport](#tcp-transport)
     - [Creating a custom transport](#creating-a-custom-transport)
 - [Contributing](#contributing)
 
@@ -35,64 +36,34 @@ To run a server you simply first have to create a server instance. When creating
 
 ```c#
 Server server = new Server();
-...
 Server server = new Server(new TcpServerTransport());
 ```
 
-The connection details are part of the transport and can be set through properties when initializing or before starting the server.
-
-```c#
-IServerTransport transport = new TcpServerTransport()
-{
-    Port = 7777,
-    MaxConnections = 10,
-}
-
-transport.Port = 7777;
-transport.MaxConnections = 10;
-```
-
-Once you have your server instance you can start the server. Simply call the method `Start()` with the port you want to start on and the max amount of connections as parameters.
+Once you have your server instance you can start the server. Simply call the method `Start()`. Before starting your server remember to set the correct connection details on your transport. For more info see [transports](#transports).
 
 If you want to stop the server again simply call `Stop()`.
 
 ```c#
-server.Start(); // Starts a server on port 7777 with a maximum of 10 connections
-...
-server.Stop(); // Stops the server and closes all connections
+server.Start();
+server.Stop();
 ```
 
 ## Connecting a client
 
-To connect a client to a server you will first need a client instance. This is practically the same as for the server. Again you also have the option to change the transport before initializing the client.
+To connect a client to a server you will first need a client instance. This is practically the same as for the server.
 
 ```c#
 Client client = new Client();
-...
 Client client = new Client(new TcpClientTransport());
 ```
 
-Just like with the server transport the connection details can be set on the transport when initializing or before connection.
-
-```c#
-IClientTransport transport = new TcpClientTransport()
-{
-    IpAddress = "127.0.0.1",
-    Port = 7777,
-}
-
-transport.IpAddress = "127.0.0.1";
-transport.Port = 7777;
-```
-
-Once you have your instance you can start connecting to a server. For this you can call the method `Connect()` with parameters for the ip address and port of the server.
+Once you have your instance you can start connecting to a server. For this you can call the method `Connect()`. Before connecting the client remember to set the correct connection details on your transport. For more info see [transports](#transports).
 
 If you want to disconnect your client you can call `Disconnect()`.
 
 ```c#
-client.Connect(); // Connects to a local server running on port 7777
-...
-client.Disconnect(); // Disconnects from the previous connected server
+client.Connect();
+client.Disconnect();
 ```
 
 ## Running the update loop
@@ -139,7 +110,9 @@ public override void OnSerialize(IWriteDataStream dataStream)
     dataStream.WriteInt(intVariable);
     dataStream.WriteString(stringVariable);
 }
-...
+```
+
+```c#
 public override void OnDeserialize(IReadDataStream dataStream)
 {
     boolVariable = dataStream.ReadBool();
@@ -176,7 +149,9 @@ You can subscribe to a message using either the server or client instance and ca
 
 ```c#
 client.Subscribe<ExampleMessage>(OnMessage);
-...
+```
+
+```c#
 private void OnExampleMessage(ExampleMessage message)
 {
 }
@@ -191,7 +166,35 @@ client.Unsubscribe<ExampleMessage>(OnMessage);
 # Transports
 
 The currently implemented and available transports are:
-- TcpTransport (default)
+- [Tcp transport](#tcp-transport) (default)
+
+## Tcp transport
+
+The tcp transport uses a tcp protocol for connecting and sending data across a network.
+
+These connection details are part of the transport and can be set through properties when initializing or before starting/connection the peer.
+
+```c#
+IServerTransport transport = new TcpServerTransport()
+{
+    Port = 7777,
+    MaxConnections = 10,
+}
+
+transport.Port = 7777;
+transport.MaxConnections = 10;
+```
+
+```c#
+IClientTransport transport = new TcpClientTransport()
+{
+    IpAddress = "127.0.0.1",
+    Port = 7777,
+}
+
+transport.IpAddress = "127.0.0.1";
+transport.Port = 7777;
+```
 
 ## Creating a custom transport
 
