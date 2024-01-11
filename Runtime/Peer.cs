@@ -10,6 +10,9 @@ using JeeLee.Networking.Transports;
 
 namespace JeeLee.Networking
 {
+    /// <summary>
+    /// General peer class which includes all shared functionality between peers `Client` and `Server`.
+    /// </summary>
     public abstract class Peer : IDisposable
     {
         private readonly ITransport _transport;
@@ -17,6 +20,10 @@ namespace JeeLee.Networking
         private readonly Dictionary<int, IMessageRegistry> _messageRegistries;
         private readonly Dictionary<Type, int> _messageIdMap;
 
+        /// <summary>
+        /// Constructor, requires an instance of ITransport. Is generally handled in the inheriting classes `Client` and `Server`.
+        /// </summary>
+        /// <param name="transport"></param>
         protected Peer(ITransport transport)
         {
             _transport = transport;
@@ -27,24 +34,36 @@ namespace JeeLee.Networking
             _transport.OnMessageReceived += OnMessageReceived;
         }
 
+        /// <summary>
+        /// Implementation of `IDispose`.
+        /// </summary>
         public void Dispose()
         {
             _transport.OnMessageReceived -= OnMessageReceived;
         }
 
+        /// <summary>
+        /// Sends a new instance of this message without setting properties.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message to be send.</typeparam>
         public void SendMessage<TMessage>()
             where TMessage : Message
         {
             SendMessage(GetMessage<TMessage>());
         }
 
+        /// <summary>
+        /// Sends a message of the given instance. Properties can be set before hand.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message to be send.</typeparam>
+        /// <param name="message">The message instance to be send.</param>
         public void SendMessage<TMessage>(TMessage message)
             where TMessage : Message
         {
             var isServerRunning = _transport is IServerTransport server && server.IsRunning;
             var isClientConnected = _transport is IClientTransport client && client.IsConnected;
             
-            if(isServerRunning || isClientConnected)
+            if (isServerRunning || isClientConnected)
             {
                 int messageId = RegisterMessageId<TMessage>();
                 DataStream dataStream = message.DataStream;
@@ -56,30 +75,49 @@ namespace JeeLee.Networking
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
 
+        /// <summary>
+        /// Allocates a message instance of the given type.
+        /// </summary>
+        /// <typeparam name="TMessage">The message type to allocate.</typeparam>
+        /// <returns>An instance of the message of the requested type.</returns>
         public TMessage GetMessage<TMessage>()
             where TMessage : Message
         {
             return AllocateMessageRegistry<TMessage>().GetMessage();
         }
 
+        /// <summary>
+        /// Subscribe a given method to messages of this type.
+        /// </summary>
+        /// <typeparam name="TMessage">The message type to subscribe to.</typeparam>
+        /// <param name="handler">The method to be called when this message is fired.</param>
         public void Subscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
             AllocateMessageRegistry<TMessage>().AddHandler(handler);
         }
 
+        /// <summary>
+        /// Unsubscribe a given method from messages of this type.
+        /// </summary>
+        /// <typeparam name="TMessage">The message type to unscubscribe from.</typeparam>
+        /// <param name="handler">The method which needs to be unsubscribed.</param>
         public void Unsubscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
             AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
         }
 
+        /// <summary>
+        /// Runs the update loop of the networking solution. Recommended to run this in `FixedUpdate`.
+        /// Makes sure to handle all connections and receiving of incomming messages.
+        /// </summary>
         public void Tick()
         {
             var isServerRunning = _transport is IServerTransport server && server.IsRunning;
             var isClientConnected = _transport is IClientTransport client && client.IsConnected;
             
-            if(!isServerRunning && !isClientConnected)
+            if (!isServerRunning && !isClientConnected)
             {
                 return;
             }
