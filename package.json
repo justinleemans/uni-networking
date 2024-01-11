@@ -2,7 +2,7 @@
     "name": "com.justinleemans.networking",
     "version": "1.0.0",
     "displayName": "Networking",
-    "description": "Custom Unity networking library",
+    "description": "Event based networking solution for Unity",
     "author": {
         "name": "Justin Leemans"
     },
