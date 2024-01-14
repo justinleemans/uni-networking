@@ -19,7 +19,7 @@ A custom networking solution based around a signals architechture from my librar
 
 # Installation
 
-Currently the best way to include this package in your project is through the unity package manager. Add the package using the git URL of this repo: https://github.com/justinleemans/networking
+Currently the best way to include this package in your project is through the unity package manager. Add the package using the git URL of this repo: https://github.com/justinleemans/networking.git
 
 # Quick Start
 
