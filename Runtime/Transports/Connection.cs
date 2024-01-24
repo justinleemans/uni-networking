@@ -11,6 +11,11 @@ namespace JeeLee.Networking.Transports
     /// </summary>
     public abstract class Connection
     {
+        /// <summary>
+        /// The event that is raised when this connection gets closed.
+        /// </summary>
+        public event Action OnConnectionClosed;
+        
         private readonly int _networkIdentifier;
 
         /// <summary>
@@ -70,6 +75,7 @@ namespace JeeLee.Networking.Transports
         public void Close()
         {
             OnClose();
+            OnConnectionClosed?.Invoke();
         }
 
         public override bool Equals(object obj)
