@@ -9,6 +9,8 @@ namespace JeeLee.Networking.Messages
     {
         private DataStream _dataStream = new DataStream();
 
+        #region IMessage Members
+
         /// <summary>
         /// Gets or sets the data stream associated with the message.
         /// </summary>
@@ -34,6 +36,8 @@ namespace JeeLee.Networking.Messages
             _dataStream.Reset();
             OnClear();
         }
+
+        #endregion
 
         /// <summary>
         /// Called when clearing the content of the message.

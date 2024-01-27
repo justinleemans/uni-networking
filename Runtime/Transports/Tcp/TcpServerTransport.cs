@@ -9,12 +9,14 @@ namespace JeeLee.Networking.Transports.Tcp
     /// </summary>
     public class TcpServerTransport : IServerTransport
     {
+        private Socket _socket;
+        
+        #region IServerTransport Members
+
         /// <summary>
         /// Event triggered when a new connection is established.
         /// </summary>
         public event Action<Connection> OnNewConnection;
-        
-        private Socket _socket;
 
         /// <summary>
         /// Gets or sets the port on which the server listens for incoming connections.
@@ -55,5 +57,7 @@ namespace JeeLee.Networking.Transports.Tcp
                 OnNewConnection?.Invoke(new TcpConnection(_socket.Accept()));
             }
         }
+
+        #endregion
     }
 }

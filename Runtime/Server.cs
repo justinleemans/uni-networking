@@ -49,6 +49,46 @@ namespace JeeLee.Networking
             _transport.OnNewConnection += OnNewConnection;
         }
 
+        #region Peer Members
+
+        /// <summary>
+        /// Called periodically to perform any necessary actions.
+        /// </summary>
+        public override void Tick()
+        {
+            if (!IsRunning)
+            {
+                return;
+            }
+
+            _transport.Tick();
+
+            foreach (var connection in _connections)
+            {
+                connection.Value.Receive(dataStream => OnMessageReceived(connection.Key, dataStream));
+            }
+        }
+
+        /// <summary>
+        /// Called before sending a message to perform any specific actions.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
+        /// <param name="message">The message being sent.</param>
+        protected override void OnSendMessage<TMessage>(TMessage message)
+        {
+            if (!IsRunning)
+            {
+                return;
+            }
+
+            foreach (var connection in _connections.Values)
+            {
+                connection.Send(message.DataStream);
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Starts the server.
         /// </summary>
@@ -147,42 +187,6 @@ namespace JeeLee.Networking
             where TMessage : Message
         {
             AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
-        }
-
-        /// <summary>
-        /// Called periodically to perform any necessary actions.
-        /// </summary>
-        public override void Tick()
-        {
-            if (!IsRunning)
-            {
-                return;
-            }
-
-            _transport.Tick();
-
-            foreach (var connection in _connections)
-            {
-                connection.Value.Receive(dataStream => OnMessageReceived(connection.Key, dataStream));
-            }
-        }
-
-        /// <summary>
-        /// Called before sending a message to perform any specific actions.
-        /// </summary>
-        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
-        /// <param name="message">The message being sent.</param>
-        protected override void OnSendMessage<TMessage>(TMessage message)
-        {
-            if (!IsRunning)
-            {
-                return;
-            }
-
-            foreach (var connection in _connections.Values)
-            {
-                connection.Send(message.DataStream);
-            }
         }
 
         private void OnNewConnection(Connection connection)

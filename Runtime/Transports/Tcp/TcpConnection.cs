@@ -22,6 +22,8 @@ namespace JeeLee.Networking.Transports.Tcp
             _socket = socket;
         }
 
+        #region Connection Members
+
         /// <summary>
         /// Sends a byte array to the connected peer using the underlying Socket.
         /// </summary>
@@ -62,5 +64,7 @@ namespace JeeLee.Networking.Transports.Tcp
         {
             _socket.Close();
         }
+
+        #endregion
     }
 }

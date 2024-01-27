@@ -33,6 +33,39 @@ namespace JeeLee.Networking
             _transport = transport;
         }
 
+        #region Peer Members
+
+        /// <summary>
+        /// Called periodically to perform any necessary actions.
+        /// </summary>
+        public override void Tick()
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            _transport.Tick();
+            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
+        }
+
+        /// <summary>
+        /// Called before sending a message to perform any specific actions.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
+        /// <param name="message">The message being sent.</param>
+        protected override void OnSendMessage<TMessage>(TMessage message)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            _connection.Send(message.DataStream);
+        }
+
+        #endregion
+
         /// <summary>
         /// Connects the client to a server.
         /// </summary>
@@ -71,35 +104,6 @@ namespace JeeLee.Networking
             _connection.Close();
 
             IsConnected = false;
-        }
-
-        /// <summary>
-        /// Called periodically to perform any necessary actions.
-        /// </summary>
-        public override void Tick()
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            _transport.Tick();
-            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
-        }
-
-        /// <summary>
-        /// Called before sending a message to perform any specific actions.
-        /// </summary>
-        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
-        /// <param name="message">The message being sent.</param>
-        protected override void OnSendMessage<TMessage>(TMessage message)
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            _connection.Send(message.DataStream);
         }
     }
 }

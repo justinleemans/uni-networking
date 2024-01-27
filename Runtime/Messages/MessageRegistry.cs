@@ -23,6 +23,8 @@ namespace JeeLee.Networking.Messages
 
         private bool _isProcessing;
 
+        #region IMessageRegistry Members
+
         /// <summary>
         /// Handles a received message.
         /// </summary>
@@ -49,6 +51,8 @@ namespace JeeLee.Networking.Messages
 
             ProcessHandlerQueues();
         }
+
+        #endregion
 
         /// <summary>
         /// Gets a message instance from the message pool or creates a new instance if the pool is empty.

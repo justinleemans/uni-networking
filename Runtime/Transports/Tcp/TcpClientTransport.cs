@@ -10,6 +10,8 @@ namespace JeeLee.Networking.Transports.Tcp
     {
         private Socket _socket;
 
+        #region IClientTransport Members
+
         /// <summary>
         /// Gets or sets the IP address of the remote server to connect to.
         /// </summary>
@@ -48,5 +50,7 @@ namespace JeeLee.Networking.Transports.Tcp
         {
             // Implementation for handling ticks, if necessary.
         }
+
+        #endregion
     }
 }
