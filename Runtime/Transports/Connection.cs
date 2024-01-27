@@ -1,6 +1,5 @@
 using System;
 using JeeLee.Networking.Exceptions;
-using JeeLee.Networking.Messages.Delegates;
 using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Transports
@@ -15,17 +14,6 @@ namespace JeeLee.Networking.Transports
         /// The event that is raised when this connection gets closed.
         /// </summary>
         public event Action OnConnectionClosed;
-        
-        private readonly int _networkIdentifier;
-
-        /// <summary>
-        /// Constructor for a connection class.
-        /// </summary>
-        /// <param name="networkIdentifier">The unique identifier for this connection. Is used to make sure the same client can't connect multiple times to the server.</param>
-        protected Connection(int networkIdentifier)
-        {
-            _networkIdentifier = networkIdentifier;
-        }
 
         /// <summary>
         /// Sends a message to this connection.
@@ -49,7 +37,7 @@ namespace JeeLee.Networking.Transports
         /// </summary>
         /// <param name="handler">Callback when a new message is received.</param>
         /// <exception cref="TransportException">Captures all exceptions that might be thrown during receive.</exception>
-        public void Receive(MessageReceivedHandler handler)
+        public void Receive(Action<DataStream> handler)
         {
             try
             {
@@ -76,21 +64,6 @@ namespace JeeLee.Networking.Transports
         {
             OnClose();
             OnConnectionClosed?.Invoke();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is Connection other)
-            {
-                return _networkIdentifier.Equals(other._networkIdentifier);
-            }
-
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return _networkIdentifier.GetHashCode();
         }
 
         /// <summary>

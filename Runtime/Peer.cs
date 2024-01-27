@@ -4,43 +4,17 @@ using System.Reflection;
 using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
 using JeeLee.Networking.Messages.Attributes;
-using JeeLee.Networking.Messages.Delegates;
 using JeeLee.Networking.Messages.Streams;
-using JeeLee.Networking.Transports;
 
 namespace JeeLee.Networking
 {
     /// <summary>
     /// General peer class which includes all shared functionality between peers `Client` and `Server`.
     /// </summary>
-    public abstract class Peer : IDisposable
+    public abstract class Peer
     {
-        private readonly ITransport _transport;
-
-        private readonly Dictionary<int, IMessageRegistry> _messageRegistries;
-        private readonly Dictionary<Type, int> _messageIdMap;
-
-        /// <summary>
-        /// Constructor, requires an instance of ITransport. Is generally handled in the inheriting classes `Client` and `Server`.
-        /// </summary>
-        /// <param name="transport"></param>
-        protected Peer(ITransport transport)
-        {
-            _transport = transport;
-
-            _messageRegistries = new Dictionary<int, IMessageRegistry>();
-            _messageIdMap = new Dictionary<Type, int>();
-
-            _transport.OnMessageReceived += OnMessageReceived;
-        }
-
-        /// <summary>
-        /// Implementation of `IDispose`.
-        /// </summary>
-        public void Dispose()
-        {
-            _transport.OnMessageReceived -= OnMessageReceived;
-        }
+        private readonly Dictionary<int, IMessageRegistry> _messageRegistries = new Dictionary<int, IMessageRegistry>();
+        private readonly Dictionary<Type, int> _messageIdMap = new Dictionary<Type, int>();
 
         /// <summary>
         /// Sends a new instance of this message without setting properties.
@@ -60,18 +34,11 @@ namespace JeeLee.Networking
         public void SendMessage<TMessage>(TMessage message)
             where TMessage : Message
         {
-            var isServerRunning = _transport is IServerTransport server && server.IsRunning;
-            var isClientConnected = _transport is IClientTransport client && client.IsConnected;
+            int messageId = RegisterMessageId<TMessage>();
+            message.DataStream.Sign(messageId);
             
-            if (isServerRunning || isClientConnected)
-            {
-                int messageId = RegisterMessageId<TMessage>();
-                DataStream dataStream = message.DataStream;
-                dataStream.Sign(messageId);
+            OnSendMessage(message);
 
-                _transport.Send(dataStream);
-            }
-            
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
 
@@ -112,20 +79,12 @@ namespace JeeLee.Networking
         /// Runs the update loop of the networking solution. Recommended to run this in `FixedUpdate`.
         /// Makes sure to handle all connections and receiving of incomming messages.
         /// </summary>
-        public void Tick()
-        {
-            var isServerRunning = _transport is IServerTransport server && server.IsRunning;
-            var isClientConnected = _transport is IClientTransport client && client.IsConnected;
-            
-            if (!isServerRunning && !isClientConnected)
-            {
-                return;
-            }
+        public abstract void Tick();
 
-            _transport.Tick();
-        }
+        protected abstract void OnSendMessage<TMessage>(TMessage message)
+            where TMessage : Message;
 
-        private void OnMessageReceived(DataStream dataStream)
+        protected void OnMessageReceived(int connectionId, DataStream dataStream)
         {
             int messageId = dataStream.ReadInt();
 
@@ -134,10 +93,10 @@ namespace JeeLee.Networking
                 return;
             }
 
-            registry.Handle(dataStream);
+            registry.Handle(connectionId, dataStream);
         }
 
-        private MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
+        protected MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
             where TMessage : Message
         {
             int messageId = RegisterMessageId<TMessage>();
@@ -150,7 +109,7 @@ namespace JeeLee.Networking
             return (MessageRegistry<TMessage>)registry;
         }
 
-        private int RegisterMessageId<TMessage>()
+        protected int RegisterMessageId<TMessage>()
             where TMessage : Message
         {
             if (!_messageIdMap.TryGetValue(typeof(TMessage), out var messageId))

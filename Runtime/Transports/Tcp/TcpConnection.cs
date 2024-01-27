@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Net.Sockets;
 
 namespace JeeLee.Networking.Transports.Tcp
@@ -11,7 +10,7 @@ namespace JeeLee.Networking.Transports.Tcp
 
         private int _nextMessageSize;
 
-        public TcpConnection(Socket socket, IPEndPoint endPoint) : base(endPoint.GetHashCode())
+        public TcpConnection(Socket socket)
         {
             _socket = socket;
         }

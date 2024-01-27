@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 
 namespace JeeLee.Networking.Transports
 {
@@ -8,16 +8,8 @@ namespace JeeLee.Networking.Transports
     /// </summary>
     public interface IServerTransport : ITransport
     {
-        /// <summary>
-        /// List of connections made to this server.
-        /// </summary>
-        HashSet<Connection> Connections { get; }
-
-        /// <summary>
-        /// Should be set to tell the peer if the server is running.
-        /// </summary>
-        bool IsRunning { get; }
-
+        event Action<Connection> OnNewConnection;
+        
         /// <summary>
         /// Called when trying to start the server over this transport.
         /// </summary>

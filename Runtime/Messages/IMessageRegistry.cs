@@ -4,6 +4,6 @@ namespace JeeLee.Networking.Messages
 {
     public interface IMessageRegistry
     {
-        void Handle(DataStream dataStream);
+        void Handle(int connectionId, DataStream dataStream);
     }
 }
