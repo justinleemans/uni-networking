@@ -3,20 +3,22 @@ using System;
 namespace JeeLee.Networking.Transports
 {
     /// <summary>
-    /// Interface that is used for the server specific implementation of the transport.
-    /// Generally only the server peer should communicate with this class.
+    /// Represents the interface for server-side network transports in the communication system.
     /// </summary>
     public interface IServerTransport : ITransport
     {
+        /// <summary>
+        /// Event triggered when a new connection is established.
+        /// </summary>
         event Action<Connection> OnNewConnection;
         
         /// <summary>
-        /// Called when trying to start the server over this transport.
+        /// Starts the server transport to listen for incoming connections.
         /// </summary>
         void Start();
         
         /// <summary>
-        /// Called when trying to stop the server running over this transport.
+        /// Stops the server transport, preventing new connections.
         /// </summary>
         void Stop();
     }

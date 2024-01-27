@@ -10,29 +10,32 @@ namespace JeeLee.Networking
     {
         private readonly IClientTransport _transport;
 
-        public Connection Connection { get; private set; }
+        private Connection _connection;
+
+        /// <summary>
+        /// Gets a value indicating whether the client is currently connected to a server.
+        /// </summary>
         public bool IsConnected { get; private set; }
 
         /// <summary>
-        /// Constructor for this client peer. Start with default tcp protocol.
+        /// Initializes a new instance of the <see cref="Client"/> class using the default TCP client transport.
         /// </summary>
         public Client() : this(new TcpClientTransport())
         {
         }
-        
+
         /// <summary>
-        /// Contstructor for this peer. Starts client with given transport.
+        /// Initializes a new instance of the <see cref="Client"/> class with a specified client transport.
         /// </summary>
-        /// <param name="transport">The transport to run the communications over.</param>
+        /// <param name="transport">The client transport to use.</param>
         public Client(IClientTransport transport)
         {
             _transport = transport;
         }
 
         /// <summary>
-        /// Connects the client over the selected transport.
+        /// Connects the client to a server.
         /// </summary>
-        /// <returns></returns>
         public void Connect()
         {
             if (IsConnected)
@@ -40,23 +43,23 @@ namespace JeeLee.Networking
                 Disconnect();
             }
 
-            Connection = _transport.Connect();
+            _connection = _transport.Connect();
 
-            if (Connection != null)
+            if (_connection != null)
             {
                 IsConnected = true;
-                Connection.OnConnectionClosed += OnConnectionClosed;
+                _connection.OnConnectionClosed += OnConnectionClosed;
             }
 
             void OnConnectionClosed()
             {
-                Connection.OnConnectionClosed -= OnConnectionClosed;
-                Connection = null;
+                _connection.OnConnectionClosed -= OnConnectionClosed;
+                _connection = null;
             }
         }
 
         /// <summary>
-        /// Disconnects the client from a server if it is connected to one.
+        /// Disconnects the client from the current server.
         /// </summary>
         public void Disconnect()
         {
@@ -65,11 +68,14 @@ namespace JeeLee.Networking
                 return;
             }
             
-            Connection.Close();
+            _connection.Close();
 
             IsConnected = false;
         }
 
+        /// <summary>
+        /// Called periodically to perform any necessary actions.
+        /// </summary>
         public override void Tick()
         {
             if (!IsConnected)
@@ -78,9 +84,14 @@ namespace JeeLee.Networking
             }
 
             _transport.Tick();
-            Connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
+            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
         }
 
+        /// <summary>
+        /// Called before sending a message to perform any specific actions.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
+        /// <param name="message">The message being sent.</param>
         protected override void OnSendMessage<TMessage>(TMessage message)
         {
             if (!IsConnected)
@@ -88,7 +99,7 @@ namespace JeeLee.Networking
                 return;
             }
 
-            Connection.Send(message.DataStream);
+            _connection.Send(message.DataStream);
         }
     }
 }

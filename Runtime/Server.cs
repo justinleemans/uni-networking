@@ -11,7 +11,14 @@ namespace JeeLee.Networking
     /// </summary>
     public sealed class Server : Peer
     {
+        /// <summary>
+        /// Event triggered when a client connects to the server.
+        /// </summary>
         public event Action<int> OnClientConnected;
+
+        /// <summary>
+        /// Event triggered when a client disconnects from the server.
+        /// </summary>
         public event Action<int> OnClientDisconnected;
         
         private readonly IServerTransport _transport;
@@ -21,21 +28,21 @@ namespace JeeLee.Networking
         private int _nextUserId;
         
         /// <summary>
-        /// Is this server currently active and running.
+        /// Gets a value indicating whether the server is running.
         /// </summary>
         public bool IsRunning { get; private set; }
 
         /// <summary>
-        /// Constructor for this server peer. Start with default tcp protocol.
+        /// Initializes a new instance of the <see cref="Server"/> class using the default TCP server transport.
         /// </summary>
         public Server() : this(new TcpServerTransport())
         {
         }
         
         /// <summary>
-        /// Contstructor for this peer. Starts server with given transport.
+        /// Initializes a new instance of the <see cref="Server"/> class with a specified server transport.
         /// </summary>
-        /// <param name="transport">The transport to run the communications over.</param>
+        /// <param name="transport">The server transport to use.</param>
         public Server(IServerTransport transport)
         {
             _transport = transport;
@@ -43,7 +50,7 @@ namespace JeeLee.Networking
         }
 
         /// <summary>
-        /// Starts the server over the selected transport.
+        /// Starts the server.
         /// </summary>
         public void Start()
         {
@@ -57,7 +64,7 @@ namespace JeeLee.Networking
         }
 
         /// <summary>
-        /// Stops the server if it is currently running.
+        /// Stops the server.
         /// </summary>
         public void Stop()
         {
@@ -72,6 +79,10 @@ namespace JeeLee.Networking
             IsRunning = false;
         }
 
+        /// <summary>
+        /// Closes the connection with the specified connection identifier.
+        /// </summary>
+        /// <param name="connectionId">The connection identifier to close.</param>
         public void Close(int connectionId)
         {
             if (!_connections.TryGetValue(connectionId, out var connection))
@@ -82,6 +93,11 @@ namespace JeeLee.Networking
             connection.Close();
         }
 
+        /// <summary>
+        /// Sends a message of type <typeparamref name="TMessage"/> to the specified client.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message to be sent.</typeparam>
+        /// <param name="connectionId">The connection identifier of the client.</param>
         public void SendMessage<TMessage>(int connectionId)
             where TMessage : Message
         {
@@ -89,6 +105,12 @@ namespace JeeLee.Networking
             SendMessage(connectionId, message);
         }
 
+        /// <summary>
+        /// Sends a specific message to the specified client.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message to be sent.</typeparam>
+        /// <param name="connectionId">The connection identifier of the client.</param>
+        /// <param name="message">The message to be sent.</param>
         public void SendMessage<TMessage>(int connectionId, TMessage message)
             where TMessage : Message
         {
@@ -105,18 +127,31 @@ namespace JeeLee.Networking
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
 
+        /// <summary>
+        /// Subscribes a message handler for messages of type <typeparamref name="TMessage"/>.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message to subscribe to.</typeparam>
+        /// <param name="handler">The message handler to be subscribed.</param>
         public void Subscribe<TMessage>(MessageFromHandler<TMessage> handler)
             where TMessage : Message
         {
             AllocateMessageRegistry<TMessage>().AddHandler(handler);
         }
 
+        /// <summary>
+        /// Unsubscribes a message handler for messages of type <typeparamref name="TMessage"/>.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message to unsubscribe from.</typeparam>
+        /// <param name="handler">The message handler to be unsubscribed.</param>
         public void Unsubscribe<TMessage>(MessageFromHandler<TMessage> handler)
             where TMessage : Message
         {
             AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
         }
 
+        /// <summary>
+        /// Called periodically to perform any necessary actions.
+        /// </summary>
         public override void Tick()
         {
             if (!IsRunning)
@@ -132,6 +167,11 @@ namespace JeeLee.Networking
             }
         }
 
+        /// <summary>
+        /// Called before sending a message to perform any specific actions.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
+        /// <param name="message">The message being sent.</param>
         protected override void OnSendMessage<TMessage>(TMessage message)
         {
             if (!IsRunning)

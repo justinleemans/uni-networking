@@ -3,14 +3,14 @@ using JeeLee.Networking.Messages.Streams;
 namespace JeeLee.Networking.Messages
 {
     /// <summary>
-    /// Abstract message class used to define messages.
+    /// Represents an abstract base class for messages in the network communication system.
     /// </summary>
     public abstract class Message : IMessage
     {
         private DataStream _dataStream = new DataStream();
 
         /// <summary>
-        /// The data stream associated with this message. Used to translate the message over the network.
+        /// Gets or sets the data stream associated with the message.
         /// </summary>
         public DataStream DataStream
         {
@@ -27,7 +27,7 @@ namespace JeeLee.Networking.Messages
         }
 
         /// <summary>
-        /// Used internally by the message registry to reset properties.
+        /// Clears the content of the message.
         /// </summary>
         public void Clear()
         {
@@ -36,26 +36,24 @@ namespace JeeLee.Networking.Messages
         }
 
         /// <summary>
-        /// Method used to define what needs to happen to a message when it gets reset for future use.
+        /// Called when clearing the content of the message.
         /// </summary>
         protected virtual void OnClear()
         {
         }
 
         /// <summary>
-        /// Called when message gets serialized in preperation to be send over the network.
-        /// Make sure the order of variables read and set is the same as in `OnDeserialize()`.
+        /// Called when serializing the message to a data stream.
         /// </summary>
-        /// <param name="dataStream">Provides a set of methods used to write data to the data stream.</param>
+        /// <param name="dataStream">The data stream to which the message is serialized.</param>
         protected virtual void OnSerialize(IWriteDataStream dataStream)
         {
         }
 
         /// <summary>
-        /// Called when a message gets deserialized after being received.
-        /// Make sure the order of variables read and set is the same as in `OnSerialize()`.
+        /// Called when deserializing the message from a data stream.
         /// </summary>
-        /// <param name="dataStream">Provides a set of methods used to read data from the data stream.</param>
+        /// <param name="dataStream">The data stream from which the message is deserialized.</param>
         protected virtual void OnDeserialize(IReadDataStream dataStream)
         {
         }

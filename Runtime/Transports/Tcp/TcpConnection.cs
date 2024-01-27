@@ -3,6 +3,9 @@ using System.Net.Sockets;
 
 namespace JeeLee.Networking.Transports.Tcp
 {
+    /// <summary>
+    /// Represents a TCP connection implementation based on the Connection abstract class.
+    /// </summary>
     public class TcpConnection : Connection
     {
         private readonly Socket _socket;
@@ -10,16 +13,28 @@ namespace JeeLee.Networking.Transports.Tcp
 
         private int _nextMessageSize;
 
+        /// <summary>
+        /// Initializes a new instance of the TcpConnection class with the specified Socket.
+        /// </summary>
+        /// <param name="socket">The underlying Socket for the connection.</param>
         public TcpConnection(Socket socket)
         {
             _socket = socket;
         }
 
+        /// <summary>
+        /// Sends a byte array to the connected peer using the underlying Socket.
+        /// </summary>
+        /// <param name="dataBuffer">The byte array to be sent.</param>
         protected override void OnSend(byte[] dataBuffer)
         {
             _socket.Send(dataBuffer, SocketFlags.None);
         }
 
+        /// <summary>
+        /// Receives a byte array from the connected peer using the underlying Socket.
+        /// </summary>
+        /// <param name="dataBuffer">The received byte array.</param>
         protected override void OnReceive(out byte[] dataBuffer)
         {
             if (_nextMessageSize <= 0 && _socket.Available >= sizeof(int))
@@ -40,6 +55,9 @@ namespace JeeLee.Networking.Transports.Tcp
             }
         }
 
+        /// <summary>
+        /// Closes the connection by closing the underlying Socket.
+        /// </summary>
         protected override void OnClose()
         {
             _socket.Close();
