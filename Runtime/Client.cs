@@ -9,53 +9,101 @@ namespace JeeLee.Networking
     public sealed class Client : Peer
     {
         private readonly IClientTransport _transport;
-        
-        /// <summary>
-        /// Is this client currently active and connected.
-        /// </summary>
-        public bool IsConnected => _transport.IsConnected;
+
+        private Connection _connection;
 
         /// <summary>
-        /// Constructor for this client peer. Start with default tcp protocol.
+        /// Gets a value indicating whether the client is currently connected to a server.
+        /// </summary>
+        public bool IsConnected { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Client"/> class using the default TCP client transport.
         /// </summary>
         public Client() : this(new TcpClientTransport())
         {
         }
-        
+
         /// <summary>
-        /// Contstructor for this peer. Starts client with given transport.
+        /// Initializes a new instance of the <see cref="Client"/> class with a specified client transport.
         /// </summary>
-        /// <param name="transport">The transport to run the communications over.</param>
-        public Client(IClientTransport transport) : base(transport)
+        /// <param name="transport">The client transport to use.</param>
+        public Client(IClientTransport transport)
         {
             _transport = transport;
         }
 
+        #region Peer Members
+
         /// <summary>
-        /// Connects the client over the selected transport.
+        /// Called periodically to perform any necessary actions.
         /// </summary>
-        /// <returns></returns>
-        public bool Connect()
+        public override void Tick()
         {
-            if (_transport.IsConnected)
+            if (!IsConnected)
             {
-                _transport.Disconnect();
+                return;
             }
-            
-            return _transport.Connect();
+
+            _transport.Tick();
+            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
         }
 
         /// <summary>
-        /// Disconnects the client from a server if it is connected to one.
+        /// Called before sending a message to perform any specific actions.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
+        /// <param name="message">The message being sent.</param>
+        protected override void OnSendMessage<TMessage>(TMessage message)
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            _connection.Send(message.DataStream);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Connects the client to a server.
+        /// </summary>
+        public void Connect()
+        {
+            if (IsConnected)
+            {
+                Disconnect();
+            }
+
+            _connection = _transport.Connect();
+
+            if (_connection != null)
+            {
+                IsConnected = true;
+                _connection.OnConnectionClosed += OnConnectionClosed;
+            }
+
+            void OnConnectionClosed()
+            {
+                _connection.OnConnectionClosed -= OnConnectionClosed;
+                _connection = null;
+            }
+        }
+
+        /// <summary>
+        /// Disconnects the client from the current server.
         /// </summary>
         public void Disconnect()
         {
-            if (!_transport.IsConnected)
+            if (!IsConnected)
             {
                 return;
             }
             
-            _transport.Disconnect();
+            _connection.Close();
+
+            IsConnected = false;
         }
     }
 }

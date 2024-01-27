@@ -32,37 +32,6 @@ namespace JeeLee.Networking.Messages.Streams
             _readableBuffer = _buffer.ToArray();
         }
 
-        /// <summary>
-        /// Gets the bytes form this data stream object.
-        /// </summary>
-        /// <returns>A byte array representation of the data stream.</returns>
-        public byte[] GetBytes()
-        {
-            _readableBuffer = _buffer.ToArray();
-            return _readableBuffer;
-        }
-
-        /// <summary>
-        /// Signs this data stream with a prefixed signature.
-        /// This signature consists of first the total message length without this length value itself and the message id.
-        /// </summary>
-        /// <param name="messageId"></param>
-        public void Sign(int messageId)
-        {
-            _buffer.InsertRange(0, BitConverter.GetBytes(messageId));
-            _buffer.InsertRange(0, BitConverter.GetBytes(_buffer.Count));
-        }
-
-        /// <summary>
-        /// Resets this data stream object to a neutral and reusable state.
-        /// </summary>
-        public void Reset()
-        {
-            _buffer = new List<byte>();
-            _readableBuffer = _buffer.ToArray();
-            _pointer = 0;
-        }
-
         #region IWriteDataStream Members
 
         /// <summary>
@@ -200,5 +169,36 @@ namespace JeeLee.Networking.Messages.Streams
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets the bytes form this data stream object.
+        /// </summary>
+        /// <returns>A byte array representation of the data stream.</returns>
+        public byte[] GetBytes()
+        {
+            _readableBuffer = _buffer.ToArray();
+            return _readableBuffer;
+        }
+
+        /// <summary>
+        /// Signs this data stream with a prefixed signature.
+        /// This signature consists of first the total message length without this length value itself and the message id.
+        /// </summary>
+        /// <param name="messageId"></param>
+        public void Sign(int messageId)
+        {
+            _buffer.InsertRange(0, BitConverter.GetBytes(messageId));
+            _buffer.InsertRange(0, BitConverter.GetBytes(_buffer.Count));
+        }
+
+        /// <summary>
+        /// Resets this data stream object to a neutral and reusable state.
+        /// </summary>
+        public void Reset()
+        {
+            _buffer = new List<byte>();
+            _readableBuffer = _buffer.ToArray();
+            _pointer = 0;
+        }
     }
 }

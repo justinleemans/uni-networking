@@ -4,48 +4,22 @@ using System.Reflection;
 using JeeLee.Networking.Exceptions;
 using JeeLee.Networking.Messages;
 using JeeLee.Networking.Messages.Attributes;
-using JeeLee.Networking.Messages.Delegates;
 using JeeLee.Networking.Messages.Streams;
-using JeeLee.Networking.Transports;
 
 namespace JeeLee.Networking
 {
     /// <summary>
-    /// General peer class which includes all shared functionality between peers `Client` and `Server`.
+    /// The base class for network communication peers.
     /// </summary>
-    public abstract class Peer : IDisposable
+    public abstract class Peer
     {
-        private readonly ITransport _transport;
-
-        private readonly Dictionary<int, IMessageRegistry> _messageRegistries;
-        private readonly Dictionary<Type, int> _messageIdMap;
+        private readonly Dictionary<int, IMessageRegistry> _messageRegistries = new Dictionary<int, IMessageRegistry>();
+        private readonly Dictionary<Type, int> _messageIdMap = new Dictionary<Type, int>();
 
         /// <summary>
-        /// Constructor, requires an instance of ITransport. Is generally handled in the inheriting classes `Client` and `Server`.
+        /// Sends a message of type <typeparamref name="TMessage"/>.
         /// </summary>
-        /// <param name="transport"></param>
-        protected Peer(ITransport transport)
-        {
-            _transport = transport;
-
-            _messageRegistries = new Dictionary<int, IMessageRegistry>();
-            _messageIdMap = new Dictionary<Type, int>();
-
-            _transport.OnMessageReceived += OnMessageReceived;
-        }
-
-        /// <summary>
-        /// Implementation of `IDispose`.
-        /// </summary>
-        public void Dispose()
-        {
-            _transport.OnMessageReceived -= OnMessageReceived;
-        }
-
-        /// <summary>
-        /// Sends a new instance of this message without setting properties.
-        /// </summary>
-        /// <typeparam name="TMessage">The type of message to be send.</typeparam>
+        /// <typeparam name="TMessage">The type of message to be sent.</typeparam>
         public void SendMessage<TMessage>()
             where TMessage : Message
         {
@@ -53,33 +27,26 @@ namespace JeeLee.Networking
         }
 
         /// <summary>
-        /// Sends a message of the given instance. Properties can be set before hand.
+        /// Sends a specific message.
         /// </summary>
-        /// <typeparam name="TMessage">The type of message to be send.</typeparam>
-        /// <param name="message">The message instance to be send.</param>
+        /// <typeparam name="TMessage">The type of message to be sent.</typeparam>
+        /// <param name="message">The message to be sent.</param>
         public void SendMessage<TMessage>(TMessage message)
             where TMessage : Message
         {
-            var isServerRunning = _transport is IServerTransport server && server.IsRunning;
-            var isClientConnected = _transport is IClientTransport client && client.IsConnected;
+            int messageId = RegisterMessageId<TMessage>();
+            message.DataStream.Sign(messageId);
             
-            if (isServerRunning || isClientConnected)
-            {
-                int messageId = RegisterMessageId<TMessage>();
-                DataStream dataStream = message.DataStream;
-                dataStream.Sign(messageId);
+            OnSendMessage(message);
 
-                _transport.Send(dataStream);
-            }
-            
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
 
         /// <summary>
-        /// Allocates a message instance of the given type.
+        /// Gets an instance of the message of type <typeparamref name="TMessage"/>.
         /// </summary>
-        /// <typeparam name="TMessage">The message type to allocate.</typeparam>
-        /// <returns>An instance of the message of the requested type.</returns>
+        /// <typeparam name="TMessage">The type of message to retrieve.</typeparam>
+        /// <returns>An instance of the specified message type.</returns>
         public TMessage GetMessage<TMessage>()
             where TMessage : Message
         {
@@ -87,10 +54,10 @@ namespace JeeLee.Networking
         }
 
         /// <summary>
-        /// Subscribe a given method to messages of this type.
+        /// Subscribes a message handler for the specified message type.
         /// </summary>
-        /// <typeparam name="TMessage">The message type to subscribe to.</typeparam>
-        /// <param name="handler">The method to be called when this message is fired.</param>
+        /// <typeparam name="TMessage">The type of message to subscribe to.</typeparam>
+        /// <param name="handler">The message handler to be subscribed.</param>
         public void Subscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
@@ -98,10 +65,10 @@ namespace JeeLee.Networking
         }
 
         /// <summary>
-        /// Unsubscribe a given method from messages of this type.
+        /// Unsubscribes a message handler for the specified message type.
         /// </summary>
-        /// <typeparam name="TMessage">The message type to unscubscribe from.</typeparam>
-        /// <param name="handler">The method which needs to be unsubscribed.</param>
+        /// <typeparam name="TMessage">The type of message to unsubscribe from.</typeparam>
+        /// <param name="handler">The message handler to be unsubscribed.</param>
         public void Unsubscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
@@ -109,23 +76,24 @@ namespace JeeLee.Networking
         }
 
         /// <summary>
-        /// Runs the update loop of the networking solution. Recommended to run this in `FixedUpdate`.
-        /// Makes sure to handle all connections and receiving of incomming messages.
+        /// Called periodically to perform any necessary actions.
         /// </summary>
-        public void Tick()
-        {
-            var isServerRunning = _transport is IServerTransport server && server.IsRunning;
-            var isClientConnected = _transport is IClientTransport client && client.IsConnected;
-            
-            if (!isServerRunning && !isClientConnected)
-            {
-                return;
-            }
+        public abstract void Tick();
 
-            _transport.Tick();
-        }
+        /// <summary>
+        /// Called before sending a message to perform any specific actions.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
+        /// <param name="message">The message being sent.</param>
+        protected abstract void OnSendMessage<TMessage>(TMessage message)
+            where TMessage : Message;
 
-        private void OnMessageReceived(DataStream dataStream)
+        /// <summary>
+        /// Called when a message is received, allowing the peer to handle the incoming message.
+        /// </summary>
+        /// <param name="connectionId">The connection identifier.</param>
+        /// <param name="dataStream">The data stream containing the received message.</param>
+        protected void OnMessageReceived(int connectionId, DataStream dataStream)
         {
             int messageId = dataStream.ReadInt();
 
@@ -134,10 +102,15 @@ namespace JeeLee.Networking
                 return;
             }
 
-            registry.Handle(dataStream);
+            registry.Handle(connectionId, dataStream);
         }
 
-        private MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
+        /// <summary>
+        /// Allocates or retrieves the message registry for a specific message type.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message for which to allocate or retrieve the registry.</typeparam>
+        /// <returns>The message registry for the specified message type.</returns>
+        protected MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
             where TMessage : Message
         {
             int messageId = RegisterMessageId<TMessage>();
@@ -150,7 +123,12 @@ namespace JeeLee.Networking
             return (MessageRegistry<TMessage>)registry;
         }
 
-        private int RegisterMessageId<TMessage>()
+        /// <summary>
+        /// Registers and retrieves the message identifier for a specific message type.
+        /// </summary>
+        /// <typeparam name="TMessage">The type of message for which to register and retrieve the identifier.</typeparam>
+        /// <returns>The message identifier for the specified message type.</returns>
+        protected int RegisterMessageId<TMessage>()
             where TMessage : Message
         {
             if (!_messageIdMap.TryGetValue(typeof(TMessage), out var messageId))

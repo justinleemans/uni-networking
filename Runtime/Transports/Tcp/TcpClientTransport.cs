@@ -1,48 +1,56 @@
 using System.Net;
 using System.Net.Sockets;
-using JeeLee.Networking.Messages.Delegates;
-using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Transports.Tcp
 {
+    /// <summary>
+    /// Represents a TCP client transport for establishing connections to a remote server.
+    /// </summary>
     public class TcpClientTransport : IClientTransport
     {
-        public event MessageReceivedHandler OnMessageReceived;
-        
         private Socket _socket;
 
+        #region IClientTransport Members
+
+        /// <summary>
+        /// Gets or sets the IP address of the remote server to connect to.
+        /// </summary>
         public string IpAddress { get; set; } = "127.0.0.1";
+
+        /// <summary>
+        /// Gets or sets the port on which the client connects to the remote server.
+        /// </summary>
         public ushort Port { get; set; } = 7777;
 
-        public Connection Connection { get; private set; }
-        public bool IsConnected { get; private set; }
-
-        public bool Connect()
+        /// <summary>
+        /// Establishes a connection to the remote server.
+        /// </summary>
+        /// <returns>The connection object representing the established connection.</returns>
+        public Connection Connect()
         {
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse(IpAddress), Port);
             _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             _socket.Connect(remoteEndPoint);
 
-            Connection = new TcpConnection(_socket, remoteEndPoint);
-
-            return IsConnected = _socket.Connected;
+            return new TcpConnection(_socket);
         }
 
+        /// <summary>
+        /// Disconnects from the current server, if connected.
+        /// </summary>
         public void Disconnect()
         {
-            IsConnected = false;
-            _socket.Close();
-            Connection = null;
+            // Implementation for disconnecting, if necessary.
         }
 
-        public void Send(DataStream dataStream)
-        {
-            Connection.Send(dataStream);
-        }
-
+        /// <summary>
+        /// Performs any necessary actions during each tick of the TCP client transport.
+        /// </summary>
         public void Tick()
         {
-            Connection.Receive(OnMessageReceived);
+            // Implementation for handling ticks, if necessary.
         }
+
+        #endregion
     }
 }

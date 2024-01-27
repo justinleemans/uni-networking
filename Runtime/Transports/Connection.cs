@@ -1,37 +1,23 @@
 using System;
 using JeeLee.Networking.Exceptions;
-using JeeLee.Networking.Messages.Delegates;
 using JeeLee.Networking.Messages.Streams;
 
 namespace JeeLee.Networking.Transports
 {
     /// <summary>
-    /// Base class for all connection specific logic.
-    /// Transports should include their own implementation of a connection.
+    /// Represents an abstract base class for network connections in the communication system.
     /// </summary>
     public abstract class Connection
     {
         /// <summary>
-        /// The event that is raised when this connection gets closed.
+        /// Event triggered when the connection is closed.
         /// </summary>
         public event Action OnConnectionClosed;
-        
-        private readonly int _networkIdentifier;
 
         /// <summary>
-        /// Constructor for a connection class.
+        /// Sends a data stream to the connected peer.
         /// </summary>
-        /// <param name="networkIdentifier">The unique identifier for this connection. Is used to make sure the same client can't connect multiple times to the server.</param>
-        protected Connection(int networkIdentifier)
-        {
-            _networkIdentifier = networkIdentifier;
-        }
-
-        /// <summary>
-        /// Sends a message to this connection.
-        /// </summary>
-        /// <param name="dataStream">The data stream representation of the message to send.</param>
-        /// <exception cref="TransportException">Captures all exceptions that might be thrown during send.</exception>
+        /// <param name="dataStream">The data stream to be sent.</param>
         public void Send(DataStream dataStream)
         {
             try
@@ -45,11 +31,10 @@ namespace JeeLee.Networking.Transports
         }
 
         /// <summary>
-        /// Attempts to receive a new message from this connection.
+        /// Receives data from the connected peer and invokes the provided handler.
         /// </summary>
-        /// <param name="handler">Callback when a new message is received.</param>
-        /// <exception cref="TransportException">Captures all exceptions that might be thrown during receive.</exception>
-        public void Receive(MessageReceivedHandler handler)
+        /// <param name="handler">The handler to process the received data.</param>
+        public void Receive(Action<DataStream> handler)
         {
             try
             {
@@ -65,12 +50,12 @@ namespace JeeLee.Networking.Transports
             }
             catch (Exception exception)
             {
-                throw new TransportException("Error trying to recieve message data", exception);
+                throw new TransportException("Error trying to receive message data", exception);
             }
         }
 
         /// <summary>
-        /// Closes this connection and disconnects it.
+        /// Closes the connection.
         /// </summary>
         public void Close()
         {
@@ -78,35 +63,20 @@ namespace JeeLee.Networking.Transports
             OnConnectionClosed?.Invoke();
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Connection other)
-            {
-                return _networkIdentifier.Equals(other._networkIdentifier);
-            }
-
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return _networkIdentifier.GetHashCode();
-        }
-
         /// <summary>
-        /// Called when send is called. Used for transport specific implementation of network communication.
+        /// Sends a byte array to the connected peer.
         /// </summary>
-        /// <param name="dataBuffer">Byte array of the converted message.</param>
+        /// <param name="dataBuffer">The byte array to be sent.</param>
         protected abstract void OnSend(byte[] dataBuffer);
 
         /// <summary>
-        /// Called when receive is calle. Used for transport specific implementation of network communication.
+        /// Receives a byte array from the connected peer.
         /// </summary>
-        /// <param name="dataBuffer">Should return byte array which is received over the network. Should contain the message id as int prefixed.</param>
+        /// <param name="dataBuffer">The received byte array.</param>
         protected abstract void OnReceive(out byte[] dataBuffer);
 
         /// <summary>
-        /// Called when close is called. Used to implement closing of this connection for this specific transport implementation.
+        /// Closes the connection. Derived classes should implement specific closing logic.
         /// </summary>
         protected abstract void OnClose();
     }

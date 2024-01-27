@@ -9,14 +9,14 @@ namespace JeeLee.Networking.Messages.Attributes
     public class MessageAttribute : Attribute
     {
         /// <summary>
-        /// The message id assigned to this message.
+        /// Gets the message id assigned to this message.
         /// </summary>
         public int MessageId { get; private set; }
 
         /// <summary>
-        /// Constructor for the message attribute. Sets the message id for this message.
+        /// Initializes a new instance of the <see cref="MessageAttribute"/> class with the specified message id.
         /// </summary>
-        /// <param name="messageId">The message id to use.</param>
+        /// <param name="messageId">The unique identifier assigned to this message.</param>
         public MessageAttribute(int messageId)
         {
             MessageId = messageId;
