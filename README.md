@@ -48,6 +48,15 @@ server.Start();
 server.Stop();
 ```
 
+The server also has two events that can be subscribed to for when a client either connects or disconnects to/from the server.
+
+```c#
+server.OnClientConnected += OnClientConnected;
+server.OnClientDisconnected += OnClientDisconnected;
+```
+
+Both these events take a delegate with an integer as parameter which represents the connection id that has connected/disconnected.
+
 ## Connecting a client
 
 To connect a client to a server you will first need a client instance. This is practically the same as for the server.
@@ -143,6 +152,13 @@ client.SendMessage<TMessage>();
 > [!WARNING]
 > It is recommended to use the included `GetMessage<TMessage>()` or `SendMessage<TMessage>()` methods to retrieve a message instance to avoid filling up the pool and never retrieving from it.
 
+In the case of the server you get an extra set of methods so you can send to specific connections. These methods are the same as the other methods but with an extra parameter.
+
+```c#
+server.SendMessage<TMessage>(connectionId);
+server.SendMessage(connectionId, message);
+```
+
 ## Receiving messages
 
 You can subscribe to a message using either the server or client instance and calling `Subscribe<TMessage>(OnMessage)` where the handler is a delegate with a message instance of the given message type as parameter.
@@ -161,6 +177,14 @@ To unsubscribe from a message you make a call similar to subscribing by calling 
 
 ```c#
 client.Unsubscribe<ExampleMessage>(OnMessage);
+```
+
+Same as with sending message, the server class has a set of extra methods that allow you to see which connection has sent a message. This simply changes the delegate to include a connection id.
+
+```c#
+private void OnExampleMessage(int connectionId, ExampleMessage message)
+{
+}
 ```
 
 # Transports
@@ -200,25 +224,18 @@ transport.Port = 7777;
 
 If you want to implement your own transport there is a few things you will have to do. You can take a look at the included [Tcp transport](https://github.com/justinleemans/networking/tree/main/Runtime/Transports/Tcp) as an example.
 
-You will have to create a class implementing the `IServerTransport` interface for the server implementation. This will require you to implement 4 methods.
-- `Start(ushort port, int maxConnections)` which is to start the server.
-- `Stop()` which is to stop the server.
-- `Send(DataStream dataStream)` which is when this peer wants to send a message to a connection, the `dataStream` object has to be passed to the connection within this method.
-- `Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.
+You will have to create a class implementing the `IServerTransport` interface for the server implementation. This will require you to implement 4 events, properties or methods.
+- `Action<Connection> OnNewConnection` which is an event that should be called when a new connection is made. Should return this new connection.
+- `void Start()` which is to start the server.
+- `void Stop()` which is to stop the server.
+- `void Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.
 
-Next you will have to create a class implementing the `IClientTransport` interface. This will also require you to implement 4 methods.
-- `Connect(string remoteAddress, ushort port)` which is used to connect this client to a server.
-- `Disconnect()` which is to disconnect this client from the server.
-- `Send(DataStream dataStream)` which is when this peer wants to send a message to a connection, the `dataStream` object has to be passed to the connection within this method.
-- `Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.
+Next you will have to create a class implementing the `IClientTransport` interface. This will also require you to implement 3 methods.
+- `Connection Connect(string remoteAddress, ushort port)` which is used to connect this client to a server. Should return an instance of Connection or null if failed to connect.
+- `void Disconnect()` which is to disconnect this client from the server.
+- `void Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.
 
-And lastly you will have to create a class deriving from `Connection`. This is the connection representing your peer. For this you will first have to override the constructor. The constructor takes and int as parameter which is used as a unique identifier to compare connections.
-
-```c#
-public ExampleConnection(int identifier) : base(identifier)
-{
-}
-```
+And lastly you will have to create a class deriving from `Connection`. This is the connection representing your peer.
 
 Next there is 3 methods you will have to implement.
 - `OnSend(byte[] dataBuffer)` which is used for sending the data. You get a byte array which you will have to send through your method of choice. Further manipulation of this byte array is generally not needed.
