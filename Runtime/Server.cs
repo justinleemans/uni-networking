@@ -142,16 +142,16 @@ namespace JeeLee.Networking
             where TMessage : Message
         {
             TMessage message = GetMessage<TMessage>();
-            SendMessage(connectionId, message);
+            SendMessage(message, connectionId);
         }
 
         /// <summary>
         /// Sends a specific message to the specified client.
         /// </summary>
         /// <typeparam name="TMessage">The type of message to be sent.</typeparam>
-        /// <param name="connectionId">The connection identifier of the client.</param>
         /// <param name="message">The message to be sent.</param>
-        public void SendMessage<TMessage>(int connectionId, TMessage message)
+        /// /// <param name="connectionId">The connection identifier of the client.</param>
+        public void SendMessage<TMessage>(TMessage message, int connectionId)
             where TMessage : Message
         {
             int messageId = RegisterMessageId<TMessage>();

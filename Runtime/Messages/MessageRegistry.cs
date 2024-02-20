@@ -44,7 +44,7 @@ namespace JeeLee.Networking.Messages
 
             foreach (var handler in _fromHandlers)
             {
-                handler?.Invoke(connectionId, message);
+                handler?.Invoke(message, connectionId);
             }
 
             _isProcessing = false;

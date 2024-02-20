@@ -156,7 +156,7 @@ In the case of the server you get an extra set of methods so you can send to spe
 
 ```c#
 server.SendMessage<TMessage>(connectionId);
-server.SendMessage(connectionId, message);
+server.SendMessage(message, connectionId);
 ```
 
 ## Receiving messages
@@ -182,7 +182,7 @@ client.Unsubscribe<ExampleMessage>(OnMessage);
 Same as with sending message, the server class has a set of extra methods that allow you to see which connection has sent a message. This simply changes the delegate to include a connection id.
 
 ```c#
-private void OnExampleMessage(int connectionId, ExampleMessage message)
+private void OnExampleMessage(ExampleMessage message, int connectionId)
 {
 }
 ```
