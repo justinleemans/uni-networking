@@ -101,6 +101,7 @@ namespace JeeLee.Networking
                 return;
             }
             
+            _transport.Disconnect();
             _connection.Close();
 
             IsConnected = false;
