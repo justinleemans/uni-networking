@@ -51,8 +51,8 @@ server.Stop();
 The server also has two events that can be subscribed to for when a client either connects or disconnects to/from the server.
 
 ```c#
-server.OnClientConnected += OnClientConnected;
-server.OnClientDisconnected += OnClientDisconnected;
+server.ClientConnected += OnClientConnected;
+server.ClientDisconnected += OnClientDisconnected;
 ```
 
 Both these events take a delegate with an integer as parameter which represents the connection id that has connected/disconnected.
@@ -225,7 +225,7 @@ transport.Port = 7777;
 If you want to implement your own transport there is a few things you will have to do. You can take a look at the included [Tcp transport](https://github.com/justinleemans/networking/tree/main/Runtime/Transports/Tcp) as an example.
 
 You will have to create a class implementing the `IServerTransport` interface for the server implementation. This will require you to implement 4 events, properties or methods.
-- `Action<Connection> OnNewConnection` which is an event that should be called when a new connection is made. Should return this new connection.
+- `Action<Connection> NewConnection` which is an event that should be called when a new connection is made. Should return this new connection.
 - `void Start()` which is to start the server.
 - `void Stop()` which is to stop the server.
 - `void Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.

@@ -81,12 +81,12 @@ namespace JeeLee.Networking
             if (_connection != null)
             {
                 IsConnected = true;
-                _connection.OnConnectionClosed += OnConnectionClosed;
+                _connection.ConnectionClosed += Handle;
             }
 
-            void OnConnectionClosed()
+            void Handle()
             {
-                _connection.OnConnectionClosed -= OnConnectionClosed;
+                _connection.ConnectionClosed -= Handle;
                 _connection = null;
             }
         }

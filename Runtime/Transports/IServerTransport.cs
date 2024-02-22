@@ -10,7 +10,7 @@ namespace JeeLee.Networking.Transports
         /// <summary>
         /// Event triggered when a new connection is established.
         /// </summary>
-        event Action<Connection> OnNewConnection;
+        event Action<Connection> NewConnection;
         
         /// <summary>
         /// Starts the server transport to listen for incoming connections.

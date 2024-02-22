@@ -14,12 +14,12 @@ namespace JeeLee.Networking
         /// <summary>
         /// Event triggered when a client connects to the server.
         /// </summary>
-        public event Action<int> OnClientConnected;
+        public event Action<int> ClientConnected;
 
         /// <summary>
         /// Event triggered when a client disconnects from the server.
         /// </summary>
-        public event Action<int> OnClientDisconnected;
+        public event Action<int> ClientDisconnected;
         
         private readonly IServerTransport _transport;
         private readonly Queue<int> _idPool = new Queue<int>();
@@ -46,7 +46,7 @@ namespace JeeLee.Networking
         public Server(IServerTransport transport)
         {
             _transport = transport;
-            _transport.OnNewConnection += OnNewConnection;
+            _transport.NewConnection += OnNewConnection;
         }
 
         #region Peer Members
@@ -192,21 +192,21 @@ namespace JeeLee.Networking
         private void OnNewConnection(Connection connection)
         {
             int connectionId = GetConnectionId();
-            connection.OnConnectionClosed += OnConnectionClosed;
+            connection.ConnectionClosed += Handle;
             _connections.Add(connectionId, connection);
 
-            OnClientConnected?.Invoke(connectionId);
+            ClientConnected?.Invoke(connectionId);
 
-            void OnConnectionClosed()
+            void Handle()
             {
-                connection.OnConnectionClosed -= OnConnectionClosed;
+                connection.ConnectionClosed -= Handle;
 
                 if (_connections.Remove(connectionId))
                 {
                     _idPool.Enqueue(connectionId);
                 }
 
-                OnClientDisconnected?.Invoke(connectionId);
+                ClientDisconnected?.Invoke(connectionId);
             }
         }
 

@@ -12,7 +12,7 @@ namespace JeeLee.Networking.Transports
         /// <summary>
         /// Event triggered when the connection is closed.
         /// </summary>
-        public event Action OnConnectionClosed;
+        public event Action ConnectionClosed;
 
         /// <summary>
         /// Sends a data stream to the connected peer.
@@ -60,7 +60,7 @@ namespace JeeLee.Networking.Transports
         public void Close()
         {
             OnClose();
-            OnConnectionClosed?.Invoke();
+            ConnectionClosed?.Invoke();
         }
 
         /// <summary>

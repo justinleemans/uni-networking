@@ -16,7 +16,7 @@ namespace JeeLee.Networking.Transports.Tcp
         /// <summary>
         /// Event triggered when a new connection is established.
         /// </summary>
-        public event Action<Connection> OnNewConnection;
+        public event Action<Connection> NewConnection;
 
         /// <summary>
         /// Gets or sets the port on which the server listens for incoming connections.
@@ -54,7 +54,7 @@ namespace JeeLee.Networking.Transports.Tcp
         {
             if (_socket.Poll(0, SelectMode.SelectRead))
             {
-                OnNewConnection?.Invoke(new TcpConnection(_socket.Accept()));
+                NewConnection?.Invoke(new TcpConnection(_socket.Accept()));
             }
         }
 
