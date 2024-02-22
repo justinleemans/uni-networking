@@ -1,3 +1,4 @@
+using System;
 using JeeLee.Networking.Transports;
 using JeeLee.Networking.Transports.Tcp;
 
@@ -8,6 +9,11 @@ namespace JeeLee.Networking
     /// </summary>
     public sealed class Client : Peer
     {
+        /// <summary>
+        /// Event triggered when a client connects to the server.
+        /// </summary>
+        public event Action ConnectionClosed;
+        
         private readonly IClientTransport _transport;
 
         private Connection _connection;
@@ -88,6 +94,8 @@ namespace JeeLee.Networking
             {
                 _connection.ConnectionClosed -= Handle;
                 _connection = null;
+
+                ConnectionClosed?.Invoke();
             }
         }
 

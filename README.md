@@ -75,6 +75,8 @@ client.Connect();
 client.Disconnect();
 ```
 
+The client also has an event which can be subscribed to for when this client gets disconnected either by disconnecting themself or getting disconnected by server.
+
 ## Running the update loop
 
 To make sure your peer is receiving all communications and managing all connections you have to consistently update the peer by calling the `Tick()` method. This goes for both server and client. It is recommended to call this method from the `FixedUpdate()` method on a MonBehaviour or through a similar approach. This is because you don't want you communications to be framerate dependant.
@@ -150,7 +152,7 @@ client.SendMessage<TMessage>();
 ```
 
 > [!WARNING]
-> It is recommended to use the included `GetMessage<TMessage>()` or `SendMessage<TMessage>()` methods to retrieve a message instance to avoid filling up the pool and never retrieving from it.
+> It is recommended to use the included `GetMessage<TMessage>()` method to retrieve a message instance to avoid filling up the pool and never retrieving from it.
 
 In the case of the server you get an extra set of methods so you can send to specific connections. These methods are the same as the other methods but with an extra parameter.
 
