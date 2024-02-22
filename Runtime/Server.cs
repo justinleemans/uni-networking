@@ -92,15 +92,22 @@ namespace JeeLee.Networking
         /// <summary>
         /// Starts the server.
         /// </summary>
-        public void Start()
+        public bool Start()
         {
             if (IsRunning)
             {
-                return;
+                return true;
             }
 
-            _transport.Start();
-            IsRunning = true;
+            try
+            {
+                _transport.Start();
+                return IsRunning = true;
+            }
+            catch
+            {
+                return IsRunning = false;
+            }
         }
 
         /// <summary>
@@ -113,10 +120,24 @@ namespace JeeLee.Networking
                 return;
             }
             
-            _transport.Stop();
-            _connections.Clear();
+            try
+            {
+                foreach (var connection in _connections.Values)
+                {
+                    connection.Close();
+                }
 
-            IsRunning = false;
+                _idPool.Clear();
+                _connections.Clear();
+                _nextUserId = 0;
+
+                _transport.Stop();
+
+                IsRunning = false;
+            }
+            catch
+            {
+            }
         }
 
         /// <summary>

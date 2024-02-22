@@ -10,7 +10,7 @@ namespace JeeLee.Networking
     public sealed class Client : Peer
     {
         /// <summary>
-        /// Event triggered when a client connects to the server.
+        /// Event triggered when this client gets disconnected.
         /// </summary>
         public event Action ConnectionClosed;
         
@@ -75,7 +75,7 @@ namespace JeeLee.Networking
         /// <summary>
         /// Connects the client to a server.
         /// </summary>
-        public void Connect()
+        public bool Connect()
         {
             if (IsConnected)
             {
@@ -89,6 +89,8 @@ namespace JeeLee.Networking
                 IsConnected = true;
                 _connection.ConnectionClosed += Handle;
             }
+
+            return IsConnected;
 
             void Handle()
             {
