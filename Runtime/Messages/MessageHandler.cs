@@ -1,4 +1,4 @@
-namespace JeeLee.Networking.Messages
+namespace JeeLee.UniNetworking.Messages
 {
     /// <summary>
     /// Represents a delegate for handling messages of type <typeparamref name="TMessage"/>.

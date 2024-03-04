@@ -1,7 +1,7 @@
 using System;
 using System.Net.Sockets;
 
-namespace JeeLee.Networking.Transports.Tcp
+namespace JeeLee.UniNetworking.Transports.Tcp
 {
     /// <summary>
     /// Represents a TCP connection implementation based on the Connection abstract class.

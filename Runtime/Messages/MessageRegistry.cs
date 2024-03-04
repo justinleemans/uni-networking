@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using JeeLee.Networking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Streams;
 
-namespace JeeLee.Networking.Messages
+namespace JeeLee.UniNetworking.Messages
 {
     /// <summary>
     /// Represents a registry for messages of type <typeparamref name="TMessage"/> in the network communication system.

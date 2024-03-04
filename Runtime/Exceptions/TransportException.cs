@@ -1,6 +1,6 @@
 using System;
 
-namespace JeeLee.Networking.Exceptions
+namespace JeeLee.UniNetworking.Exceptions
 {
     public class TransportException : Exception
     {

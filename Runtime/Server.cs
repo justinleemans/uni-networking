@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using JeeLee.Networking.Messages;
-using JeeLee.Networking.Transports;
-using JeeLee.Networking.Transports.Tcp;
+using JeeLee.UniNetworking.Messages;
+using JeeLee.UniNetworking.Transports;
+using JeeLee.UniNetworking.Transports.Tcp;
 
-namespace JeeLee.Networking
+namespace JeeLee.UniNetworking
 {
     /// <summary>
     /// Server peer. Runs the general server code which allows clients to connect to it.

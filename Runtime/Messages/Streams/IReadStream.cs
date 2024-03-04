@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace JeeLee.Networking.Messages.Streams
+namespace JeeLee.UniNetworking.Messages.Streams
 {
     /// <summary>
     /// Interface for reading data from a data stream object.

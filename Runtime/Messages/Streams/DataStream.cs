@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using JeeLee.Networking.Exceptions;
+using JeeLee.UniNetworking.Exceptions;
 
-namespace JeeLee.Networking.Messages.Streams
+namespace JeeLee.UniNetworking.Messages.Streams
 {
     /// <summary>
     /// The data container used to translate network messages.

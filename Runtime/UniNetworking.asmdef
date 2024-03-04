@@ -1,6 +1,6 @@
 {
-    "name": "Networking",
-    "rootNamespace": "JeeLee.Networking",
+    "name": "UniNetworking",
+    "rootNamespace": "JeeLee.UniNetworking",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

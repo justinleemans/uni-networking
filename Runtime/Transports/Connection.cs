@@ -1,8 +1,8 @@
 using System;
-using JeeLee.Networking.Exceptions;
-using JeeLee.Networking.Messages.Streams;
+using JeeLee.UniNetworking.Exceptions;
+using JeeLee.UniNetworking.Messages.Streams;
 
-namespace JeeLee.Networking.Transports
+namespace JeeLee.UniNetworking.Transports
 {
     /// <summary>
     /// Represents an abstract base class for network connections in the communication system.

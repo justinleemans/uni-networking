@@ -1,7 +1,7 @@
 {
-    "name": "com.justinleemans.networking",
+    "name": "com.justinleemans.uni-networking",
     "version": "1.0.0",
-    "displayName": "Networking",
+    "displayName": "UniNetworking",
     "description": "Event based networking solution for Unity",
     "author": {
         "name": "Justin Leemans"

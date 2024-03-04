@@ -1,6 +1,6 @@
-using JeeLee.Networking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Streams;
 
-namespace JeeLee.Networking.Messages
+namespace JeeLee.UniNetworking.Messages
 {
     /// <summary>
     /// Represents an abstract base class for messages in the network communication system.

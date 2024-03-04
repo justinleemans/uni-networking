@@ -1,4 +1,4 @@
-# Networking - Event based networking solution for Unity
+# UniNetworking - Event based networking solution for Unity
 
 A custom networking solution based around a signals architechture from my library [justinleemans/signals](https://github.com/justinleemans/signals).
 
@@ -19,7 +19,7 @@ A custom networking solution based around a signals architechture from my librar
 
 # Installation
 
-Currently the best way to include this package in your project is through the unity package manager. Add the package using the git URL of this repo: https://github.com/justinleemans/networking.git
+Currently the best way to include this package in your project is through the unity package manager. Add the package using the git URL of this repo: https://github.com/justinleemans/uni-networking.git
 
 # Quick Start
 

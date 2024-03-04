@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace JeeLee.Networking.Messages.Streams
+namespace JeeLee.UniNetworking.Messages.Streams
 {
     /// <summary>
     /// Interface for writing to a data stream object.

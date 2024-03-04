@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using JeeLee.Networking.Exceptions;
-using JeeLee.Networking.Messages;
-using JeeLee.Networking.Messages.Attributes;
-using JeeLee.Networking.Messages.Streams;
+using JeeLee.UniNetworking.Exceptions;
+using JeeLee.UniNetworking.Messages;
+using JeeLee.UniNetworking.Messages.Attributes;
+using JeeLee.UniNetworking.Messages.Streams;
 
-namespace JeeLee.Networking
+namespace JeeLee.UniNetworking
 {
     /// <summary>
     /// The base class for network communication peers.

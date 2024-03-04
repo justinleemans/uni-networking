@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace JeeLee.Networking.Transports.Tcp
+namespace JeeLee.UniNetworking.Transports.Tcp
 {
     /// <summary>
     /// Represents a TCP client transport for establishing connections to a remote server.

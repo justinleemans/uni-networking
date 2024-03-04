@@ -1,6 +1,6 @@
 using System;
 
-namespace JeeLee.Networking.Messages.Attributes
+namespace JeeLee.UniNetworking.Messages.Attributes
 {
     /// <summary>
     /// Attribute used to assign a unique Id to a message. Allows messages to be identified over the network.

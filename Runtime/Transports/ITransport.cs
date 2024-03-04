@@ -1,4 +1,4 @@
-namespace JeeLee.Networking.Transports
+namespace JeeLee.UniNetworking.Transports
 {
     /// <summary>
     /// Represents the interface for network transports in the communication system.

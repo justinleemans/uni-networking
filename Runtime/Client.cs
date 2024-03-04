@@ -1,8 +1,8 @@
 using System;
-using JeeLee.Networking.Transports;
-using JeeLee.Networking.Transports.Tcp;
+using JeeLee.UniNetworking.Transports;
+using JeeLee.UniNetworking.Transports.Tcp;
 
-namespace JeeLee.Networking
+namespace JeeLee.UniNetworking
 {
     /// <summary>
     /// Client peer. Runs the general client code which allows a connection to be made to a server peer.
