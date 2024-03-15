@@ -18,7 +18,11 @@ namespace JeeLee.UniNetworking.Messages
         {
             get
             {
-                OnSerialize(_dataStream);
+                if (!_dataStream.IsWritten)
+                {
+                    OnSerialize(_dataStream);
+                }
+
                 return _dataStream;
             }
             set

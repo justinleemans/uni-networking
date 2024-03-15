@@ -15,6 +15,8 @@ namespace JeeLee.UniNetworking.Messages.Streams
         private byte[] _readableBuffer;
         private int _pointer;
 
+        public bool IsWritten => _buffer.Any();
+
         /// <summary>
         /// Constructor to create a new empty data stream object.
         /// </summary>
