@@ -15,6 +15,9 @@ namespace JeeLee.UniNetworking.Messages.Streams
         private byte[] _readableBuffer;
         private int _pointer;
 
+        /// <summary>
+        /// Gets a value indicating whether any data has been written to this data stream.
+        /// </summary>
         public bool IsWritten => _buffer.Any();
 
         /// <summary>
