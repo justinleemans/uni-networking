@@ -25,7 +25,7 @@ namespace JeeLee.UniNetworking
         private readonly Queue<int> _idPool = new Queue<int>();
         private readonly Dictionary<int, Connection> _connections = new Dictionary<int, Connection>();
 
-        private int _nextUserId;
+        private int _lastUserId;
         
         /// <summary>
         /// Gets a value indicating whether the server is running.
@@ -129,7 +129,7 @@ namespace JeeLee.UniNetworking
 
                 _idPool.Clear();
                 _connections.Clear();
-                _nextUserId = 0;
+                _lastUserId = 0;
 
                 _transport.Stop();
 
@@ -236,7 +236,7 @@ namespace JeeLee.UniNetworking
                 return _idPool.Dequeue();
             }
 
-            return ++_nextUserId;
+            return ++_lastUserId;
         }
     }
 }
