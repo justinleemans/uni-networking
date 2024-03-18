@@ -178,12 +178,10 @@ namespace JeeLee.UniNetworking
             int messageId = RegisterMessageId<TMessage>();
             message.DataStream.Sign(messageId);
 
-            if (!_connections.TryGetValue(connectionId, out var connection))
+            if (_connections.TryGetValue(connectionId, out var connection))
             {
-                return;
+                connection.Send(message.DataStream);
             }
-
-            connection.Send(message.DataStream);
 
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
