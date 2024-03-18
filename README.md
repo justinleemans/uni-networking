@@ -77,9 +77,13 @@ client.Disconnect();
 
 The client also has an event which can be subscribed to for when this client gets disconnected either by disconnecting themself or getting disconnected by server.
 
+```c#
+client.ConnectionClosed += OnConnectionClosed;
+```
+
 ## Running the update loop
 
-To make sure your peer is receiving all communications and managing all connections you have to consistently update the peer by calling the `Tick()` method. This goes for both server and client. It is recommended to call this method from the `FixedUpdate()` method on a MonBehaviour or through a similar approach. This is because you don't want you communications to be framerate dependant.
+To make sure your peer is receiving all communications and managing all connections you have to consistently update the peer by calling the `Tick()` method. This goes for both server and client. It is recommended to call this method from the `FixedUpdate()` method on a MonoBehaviour or through a similar approach. This is because you don't want you communications to be framerate dependant.
 
 ## Creating messages
 
