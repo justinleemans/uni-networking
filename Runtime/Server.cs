@@ -10,7 +10,7 @@ namespace JeeLee.UniNetworking
     /// <summary>
     /// Server peer. Runs the general server code which allows clients to connect to it.
     /// </summary>
-    public sealed class Server : Peer
+    public sealed class Server : Peer, IServer
     {
         /// <summary>
         /// Event triggered when a client connects to the server.
@@ -53,24 +53,6 @@ namespace JeeLee.UniNetworking
         #region Peer Members
 
         /// <summary>
-        /// Called periodically to perform any necessary actions.
-        /// </summary>
-        public override void Tick()
-        {
-            if (!IsRunning)
-            {
-                return;
-            }
-
-            _transport.Tick();
-
-            foreach (var connection in _connections)
-            {
-                connection.Value.Receive(dataStream => OnMessageReceived(connection.Key, dataStream));
-            }
-        }
-
-        /// <summary>
         /// Sends a data stream to the peer.
         /// </summary>
         /// <param name="dataStream">The data stream to be sent.</param>
@@ -88,6 +70,8 @@ namespace JeeLee.UniNetworking
         }
 
         #endregion
+
+        #region IServer Members
 
         /// <summary>
         /// Starts the server.
@@ -144,7 +128,7 @@ namespace JeeLee.UniNetworking
         /// Closes the connection with the specified connection identifier.
         /// </summary>
         /// <param name="connectionId">The connection identifier to close.</param>
-        public void Close(int connectionId)
+        public void CloseConnection(int connectionId)
         {
             if (!_connections.TryGetValue(connectionId, out var connection))
             {
@@ -206,6 +190,26 @@ namespace JeeLee.UniNetworking
         {
             AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
         }
+
+        /// <summary>
+        /// Called periodically to perform any necessary actions.
+        /// </summary>
+        public void Tick()
+        {
+            if (!IsRunning)
+            {
+                return;
+            }
+
+            _transport.Tick();
+
+            foreach (var connection in _connections)
+            {
+                connection.Value.Receive(dataStream => OnMessageReceived(connection.Key, dataStream));
+            }
+        }
+
+        #endregion
 
         private void OnNewConnection(Connection connection)
         {

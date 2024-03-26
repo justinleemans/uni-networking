@@ -11,10 +11,12 @@ namespace JeeLee.UniNetworking
     /// <summary>
     /// The base class for network communication peers.
     /// </summary>
-    public abstract class Peer
+    public abstract class Peer : IPeer
     {
         private readonly Dictionary<int, IMessageRegistry> _messageRegistries = new Dictionary<int, IMessageRegistry>();
         private readonly Dictionary<Type, int> _messageIdMap = new Dictionary<Type, int>();
+
+        #region IPeer Members
 
         /// <summary>
         /// Sends a message of type <typeparamref name="TMessage"/>.
@@ -74,10 +76,7 @@ namespace JeeLee.UniNetworking
             AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
         }
 
-        /// <summary>
-        /// Called periodically to perform any necessary actions.
-        /// </summary>
-        public abstract void Tick();
+        #endregion
 
         /// <summary>
         /// Sends a data stream to the peer.

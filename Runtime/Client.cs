@@ -8,7 +8,7 @@ namespace JeeLee.UniNetworking
     /// <summary>
     /// Client peer. Runs the general client code which allows a connection to be made to a server peer.
     /// </summary>
-    public sealed class Client : Peer
+    public sealed class Client : Peer, IClient
     {
         /// <summary>
         /// Event triggered when this client gets disconnected.
@@ -43,20 +43,6 @@ namespace JeeLee.UniNetworking
         #region Peer Members
 
         /// <summary>
-        /// Called periodically to perform any necessary actions.
-        /// </summary>
-        public override void Tick()
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-
-            _transport.Tick();
-            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
-        }
-
-        /// <summary>
         /// Sends a data stream to the peer.
         /// </summary>
         /// <param name="dataStream">The data stream to be sent.</param>
@@ -71,6 +57,8 @@ namespace JeeLee.UniNetworking
         }
 
         #endregion
+
+        #region IClient Members
 
         /// <summary>
         /// Connects the client to a server.
@@ -116,5 +104,21 @@ namespace JeeLee.UniNetworking
 
             IsConnected = false;
         }
+
+        /// <summary>
+        /// Called periodically to perform any necessary actions.
+        /// </summary>
+        public void Tick()
+        {
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            _transport.Tick();
+            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
+        }
+
+        #endregion
     }
 }
