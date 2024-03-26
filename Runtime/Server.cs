@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JeeLee.UniNetworking.Messages;
+using JeeLee.UniNetworking.Messages.Streams;
 using JeeLee.UniNetworking.Transports;
 using JeeLee.UniNetworking.Transports.Tcp;
 
@@ -70,11 +71,10 @@ namespace JeeLee.UniNetworking
         }
 
         /// <summary>
-        /// Called before sending a message to perform any specific actions.
+        /// Sends a data stream to the peer.
         /// </summary>
-        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
-        /// <param name="message">The message being sent.</param>
-        protected override void OnSendMessage<TMessage>(TMessage message)
+        /// <param name="dataStream">The data stream to be sent.</param>
+        protected override void SendDataStream(DataStream dataStream)
         {
             if (!IsRunning)
             {
@@ -83,7 +83,7 @@ namespace JeeLee.UniNetworking
 
             foreach (var connection in _connections.Values)
             {
-                connection.Send(message.DataStream);
+                connection.Send(dataStream);
             }
         }
 
@@ -176,11 +176,10 @@ namespace JeeLee.UniNetworking
             where TMessage : Message
         {
             int messageId = RegisterMessageId<TMessage>();
-            message.DataStream.Sign(messageId);
 
             if (_connections.TryGetValue(connectionId, out var connection))
             {
-                connection.Send(message.DataStream);
+                connection.Send(message.Serialize(messageId));
             }
 
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);

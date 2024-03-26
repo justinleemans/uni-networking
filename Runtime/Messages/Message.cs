@@ -5,43 +5,39 @@ namespace JeeLee.UniNetworking.Messages
     /// <summary>
     /// Represents an abstract base class for messages in the network communication system.
     /// </summary>
-    public abstract class Message : IMessage
+    public abstract class Message
     {
-        private DataStream _dataStream = new DataStream();
-
-        #region IMessage Members
-
-        /// <summary>
-        /// Gets or sets the data stream associated with the message.
-        /// </summary>
-        public DataStream DataStream
-        {
-            get
-            {
-                if (!_dataStream.IsWritten)
-                {
-                    OnSerialize(_dataStream);
-                }
-
-                return _dataStream;
-            }
-            set
-            {
-                _dataStream = value;
-                OnDeserialize(_dataStream);
-            }
-        }
-
         /// <summary>
         /// Clears the content of the message.
         /// </summary>
-        public void Clear()
+        internal void Clear()
         {
-            _dataStream.Reset();
             OnClear();
         }
 
-        #endregion
+        /// <summary>
+        /// Serializes the message to a data stream with the specified message ID.
+        /// </summary>
+        /// <param name="messageId">The ID assigned to the message.</param>
+        /// <returns>The serialized message as a data stream.</returns>
+        internal DataStream Serialize(int messageId)
+        {
+            var dataStream = new DataStream();
+
+            OnSerialize(dataStream);
+            dataStream.Sign(messageId);
+            
+            return dataStream;
+        }
+
+        /// <summary>
+        /// Deserializes the message from the provided data stream.
+        /// </summary>
+        /// <param name="dataStream">The data stream containing the serialized message.</param>
+        internal void Deserialize(DataStream dataStream)
+        {
+            OnDeserialize(dataStream);
+        }
 
         /// <summary>
         /// Called when clearing the content of the message.

@@ -1,4 +1,5 @@
 using System;
+using JeeLee.UniNetworking.Messages.Streams;
 using JeeLee.UniNetworking.Transports;
 using JeeLee.UniNetworking.Transports.Tcp;
 
@@ -56,18 +57,17 @@ namespace JeeLee.UniNetworking
         }
 
         /// <summary>
-        /// Called before sending a message to perform any specific actions.
+        /// Sends a data stream to the peer.
         /// </summary>
-        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
-        /// <param name="message">The message being sent.</param>
-        protected override void OnSendMessage<TMessage>(TMessage message)
+        /// <param name="dataStream">The data stream to be sent.</param>
+        protected override void SendDataStream(DataStream dataStream)
         {
             if (!IsConnected)
             {
                 return;
             }
 
-            _connection.Send(message.DataStream);
+            _connection.Send(dataStream);
         }
 
         #endregion

@@ -35,9 +35,8 @@ namespace JeeLee.UniNetworking
             where TMessage : Message
         {
             int messageId = RegisterMessageId<TMessage>();
-            message.DataStream.Sign(messageId);
             
-            OnSendMessage(message);
+            SendDataStream(message.Serialize(messageId));
 
             AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
         }
@@ -81,12 +80,10 @@ namespace JeeLee.UniNetworking
         public abstract void Tick();
 
         /// <summary>
-        /// Called before sending a message to perform any specific actions.
+        /// Sends a data stream to the peer.
         /// </summary>
-        /// <typeparam name="TMessage">The type of message being sent.</typeparam>
-        /// <param name="message">The message being sent.</param>
-        protected abstract void OnSendMessage<TMessage>(TMessage message)
-            where TMessage : Message;
+        /// <param name="dataStream">The data stream to be sent.</param>
+        protected abstract void SendDataStream(DataStream dataStream);
 
         /// <summary>
         /// Called when a message is received, allowing the peer to handle the incoming message.

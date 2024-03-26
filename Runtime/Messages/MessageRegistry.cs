@@ -9,7 +9,7 @@ namespace JeeLee.UniNetworking.Messages
     /// </summary>
     /// <typeparam name="TMessage">The type of messages handled by the registry.</typeparam>
     public sealed class MessageRegistry<TMessage> : IMessageRegistry
-        where TMessage : IMessage
+        where TMessage : Message
     {
         private readonly Queue<TMessage> _pool = new Queue<TMessage>();
 
@@ -35,7 +35,7 @@ namespace JeeLee.UniNetworking.Messages
             _isProcessing = true;
 
             TMessage message = GetMessage();
-            message.DataStream = dataStream;
+            message.Deserialize(dataStream);
 
             foreach (var handler in _handlers)
             {

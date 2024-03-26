@@ -16,11 +16,6 @@ namespace JeeLee.UniNetworking.Messages.Streams
         private int _pointer;
 
         /// <summary>
-        /// Gets a value indicating whether any data has been written to this data stream.
-        /// </summary>
-        public bool IsWritten => _buffer.Any();
-
-        /// <summary>
         /// Constructor to create a new empty data stream object.
         /// </summary>
         public DataStream() : this(new List<byte>())
