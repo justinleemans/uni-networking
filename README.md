@@ -1,6 +1,8 @@
 # UniNetworking - Event based networking solution for Unity
 
-A custom networking solution based around a signals architechture from my library [justinleemans/signals](https://github.com/justinleemans/signals).
+A custom networking solution based around a signals architechture from my library [justinleemans/signals](https://github.com/justinleemans/signals). UniNetworking offers a solution to easily establish connections and offers an easy to use and understand messaging layer leaving you in control of what data you want to send back and forth.
+
+UniNetworking is capable of being used in many different configurations like dedicated server and client applications as well as a host client implementation where a client hosts the server in the same application.
 
 # Table of Contents
 
