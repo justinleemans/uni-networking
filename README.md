@@ -4,6 +4,8 @@ A custom networking solution based around a signals architechture from my librar
 
 UniNetworking is capable of being used in many different configurations like dedicated server and client applications as well as a host client implementation where a client hosts the server in the same application.
 
+Although UniNetworking is designed to work with Unity specifically it is totally independant and does not rely on any Unity specific methods. As such this package could also theoretically be implemented in any other .Net platform of your choice.
+
 # Table of Contents
 
 - [Installation](#installation)
@@ -14,6 +16,7 @@ UniNetworking is capable of being used in many different configurations like ded
     - [Creating messages](#creating-messages)
     - [Sending messages](#sending-messages)
     - [Receiving messages](#receiving-messages)
+- [Logging](#logging)
 - [Transports](#transports)
     - [Tcp transport](#tcp-transport)
     - [Creating a custom transport](#creating-a-custom-transport)
@@ -194,6 +197,18 @@ private void OnExampleMessage(ExampleMessage message, int connectionId)
 {
 }
 ```
+
+# Logging
+
+UniNetworking comes with a custom logger. This is one of the additions made to keep this system independant from whatever platform it is used on.
+
+To enable logging simply register your preferred log methods by calling the `SetLogMethod()` method on the `NetworkLogger` class. This method takes two arguments. First an enum of type `LogLevel` which determines at which method should be used for which severity. And also a method that takes a string argument for the actual log method.
+
+```c#
+NetworkLogger.SetLogMethod(LogLevel.Log, Debug.Log);
+```
+
+If you need to disable logging for some reason than you can do that by toggling the `IsEnabled` property on the `NetworkLogger` class.
 
 # Transports
 
