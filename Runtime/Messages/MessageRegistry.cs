@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages.Streams;
 
 namespace JeeLee.UniNetworking.Messages
@@ -36,6 +37,8 @@ namespace JeeLee.UniNetworking.Messages
 
             TMessage message = GetMessage();
             message.Deserialize(dataStream);
+
+            NetworkLogger.Log(message);
 
             foreach (var handler in _handlers)
             {

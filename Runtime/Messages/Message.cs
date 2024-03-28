@@ -1,3 +1,5 @@
+using System;
+using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages.Streams;
 
 namespace JeeLee.UniNetworking.Messages
@@ -22,12 +24,21 @@ namespace JeeLee.UniNetworking.Messages
         /// <returns>The serialized message as a data stream.</returns>
         internal DataStream Serialize(int messageId)
         {
-            var dataStream = new DataStream();
+            try
+            {
+                var dataStream = new DataStream();
+                
+                OnSerialize(dataStream);
+                dataStream.Sign(messageId);
 
-            OnSerialize(dataStream);
-            dataStream.Sign(messageId);
-            
-            return dataStream;
+                return dataStream;
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+                
+                return null;
+            }
         }
 
         /// <summary>
@@ -36,7 +47,14 @@ namespace JeeLee.UniNetworking.Messages
         /// <param name="dataStream">The data stream containing the serialized message.</param>
         internal void Deserialize(DataStream dataStream)
         {
-            OnDeserialize(dataStream);
+            try
+            {
+                OnDeserialize(dataStream);
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+            }
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
 using JeeLee.UniNetworking.Messages.Streams;
 using JeeLee.UniNetworking.Transports;
@@ -86,10 +87,13 @@ namespace JeeLee.UniNetworking
             try
             {
                 _transport.Start();
+
                 return IsRunning = true;
             }
-            catch
+            catch (Exception exception)
             {
+                NetworkLogger.Log(exception, LogLevel.Error);
+
                 return IsRunning = false;
             }
         }
@@ -119,8 +123,9 @@ namespace JeeLee.UniNetworking
 
                 IsRunning = false;
             }
-            catch
+            catch (Exception exception)
             {
+                NetworkLogger.Log(exception, LogLevel.Error);
             }
         }
 
@@ -159,14 +164,22 @@ namespace JeeLee.UniNetworking
         public void SendMessage<TMessage>(TMessage message, int connectionId)
             where TMessage : Message
         {
-            int messageId = RegisterMessageId<TMessage>();
-
-            if (_connections.TryGetValue(connectionId, out var connection))
+            try
             {
-                connection.Send(message.Serialize(messageId));
+                int messageId = RegisterMessageId<TMessage>();
+                DataStream dataStream = message.Serialize(messageId);
+
+                if (dataStream != null && _connections.TryGetValue(connectionId, out var connection))
+                {
+                    connection.Send(dataStream);
+                }
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
             }
 
-            AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
+            AllocateMessageRegistry<TMessage>()?.ReleaseMessage(message);
         }
 
         /// <summary>
@@ -177,7 +190,7 @@ namespace JeeLee.UniNetworking
         public void Subscribe<TMessage>(MessageFromHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>().AddHandler(handler);
+            AllocateMessageRegistry<TMessage>()?.AddHandler(handler);
         }
 
         /// <summary>
@@ -188,7 +201,7 @@ namespace JeeLee.UniNetworking
         public void Unsubscribe<TMessage>(MessageFromHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
+            AllocateMessageRegistry<TMessage>()?.RemoveHandler(handler);
         }
 
         /// <summary>

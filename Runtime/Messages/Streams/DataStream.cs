@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using JeeLee.UniNetworking.Exceptions;
 
 namespace JeeLee.UniNetworking.Messages.Streams
 {
@@ -85,7 +84,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         {
             if (_pointer > _buffer.Count)
             {
-                throw new DataStreamException();
+                throw new Exception("Pointer overflow, trying to read data(bool) past end of buffer");
             }
 
             bool value = BitConverter.ToBoolean(_readableBuffer, _pointer);
@@ -107,7 +106,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         {
             if (_pointer > _buffer.Count)
             {
-                throw new DataStreamException();
+                throw new Exception("Pointer overflow, trying to read data(float) past end of buffer");
             }
 
             float value = BitConverter.ToSingle(_readableBuffer, _pointer);
@@ -129,7 +128,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         {
             if (_pointer > _buffer.Count)
             {
-                throw new DataStreamException();
+                throw new Exception("Pointer overflow, trying to read data(int) past end of buffer");
             }
 
             int value = BitConverter.ToInt32(_readableBuffer, _pointer);
@@ -164,7 +163,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
             }
             catch
             {
-                throw new DataStreamException();
+                throw new Exception("Error trying to read string data from buffer");
             }
         }
 

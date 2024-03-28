@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using JeeLee.UniNetworking.Exceptions;
+using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
 using JeeLee.UniNetworking.Messages.Attributes;
 using JeeLee.UniNetworking.Messages.Streams;
@@ -36,11 +36,22 @@ namespace JeeLee.UniNetworking
         public void SendMessage<TMessage>(TMessage message)
             where TMessage : Message
         {
-            int messageId = RegisterMessageId<TMessage>();
+            try
+            {
+                int messageId = RegisterMessageId<TMessage>();
+                DataStream dataStream = message.Serialize(messageId);
             
-            SendDataStream(message.Serialize(messageId));
+                if (dataStream != null)
+                {
+                    SendDataStream(dataStream);
+                }
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+            }
 
-            AllocateMessageRegistry<TMessage>().ReleaseMessage(message);
+            AllocateMessageRegistry<TMessage>()?.ReleaseMessage(message);
         }
 
         /// <summary>
@@ -51,7 +62,7 @@ namespace JeeLee.UniNetworking
         public TMessage GetMessage<TMessage>()
             where TMessage : Message
         {
-            return AllocateMessageRegistry<TMessage>().GetMessage();
+            return AllocateMessageRegistry<TMessage>()?.GetMessage();
         }
 
         /// <summary>
@@ -62,7 +73,7 @@ namespace JeeLee.UniNetworking
         public void Subscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>().AddHandler(handler);
+            AllocateMessageRegistry<TMessage>()?.AddHandler(handler);
         }
 
         /// <summary>
@@ -73,7 +84,7 @@ namespace JeeLee.UniNetworking
         public void Unsubscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>().RemoveHandler(handler);
+            AllocateMessageRegistry<TMessage>()?.RemoveHandler(handler);
         }
 
         #endregion
@@ -109,14 +120,23 @@ namespace JeeLee.UniNetworking
         protected MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
             where TMessage : Message
         {
-            int messageId = RegisterMessageId<TMessage>();
-            
-            if (!_messageRegistries.TryGetValue(messageId, out var registry))
+            try
             {
-                _messageRegistries.Add(messageId, registry = new MessageRegistry<TMessage>());
-            }
+                int messageId = RegisterMessageId<TMessage>();
+            
+                if (!_messageRegistries.TryGetValue(messageId, out var registry))
+                {
+                    _messageRegistries.Add(messageId, registry = new MessageRegistry<TMessage>());
+                }
 
-            return (MessageRegistry<TMessage>)registry;
+                return (MessageRegistry<TMessage>)registry;
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+                
+                return null;
+            }
         }
 
         /// <summary>
@@ -133,7 +153,7 @@ namespace JeeLee.UniNetworking
 
                 if (messageAttribute == null)
                 {
-                    throw new InvalidBindException();
+                    throw new Exception("Could not bind message, message id not found");
                 }
 
                 _messageIdMap.Add(typeof(TMessage), messageId = messageAttribute.MessageId);

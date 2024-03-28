@@ -1,5 +1,5 @@
 using System;
-using JeeLee.UniNetworking.Exceptions;
+using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages.Streams;
 
 namespace JeeLee.UniNetworking.Transports
@@ -26,7 +26,7 @@ namespace JeeLee.UniNetworking.Transports
             }
             catch (Exception exception)
             {
-                throw new TransportException("Error trying to send message", exception);
+                NetworkLogger.Log(exception, LogLevel.Error);
             }
         }
 
@@ -50,7 +50,7 @@ namespace JeeLee.UniNetworking.Transports
             }
             catch (Exception exception)
             {
-                throw new TransportException("Error trying to receive message data", exception);
+                NetworkLogger.Log(exception, LogLevel.Error);
             }
         }
 
