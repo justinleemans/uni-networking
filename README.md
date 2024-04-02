@@ -16,10 +16,10 @@ Although UniNetworking is designed to work with Unity specifically it is totally
     - [Creating messages](#creating-messages)
     - [Sending messages](#sending-messages)
     - [Receiving messages](#receiving-messages)
-- [Logging](#logging)
 - [Transports](#transports)
     - [Tcp transport](#tcp-transport)
     - [Creating a custom transport](#creating-a-custom-transport)
+- [Logging](#logging)
 - [Contributing](#contributing)
 
 # Installation
@@ -198,18 +198,6 @@ private void OnExampleMessage(ExampleMessage message, int connectionId)
 }
 ```
 
-# Logging
-
-UniNetworking comes with a custom logger. This is one of the additions made to keep this system independant from whatever platform it is used on.
-
-To enable logging simply register your preferred log methods by calling the `SetLogMethod()` method on the `NetworkLogger` class. This method takes two arguments. First an enum of type `LogLevel` which determines at which method should be used for which severity. And also a method that takes a string argument for the actual log method.
-
-```c#
-NetworkLogger.SetLogMethod(LogLevel.Log, Debug.Log);
-```
-
-If you need to disable logging for some reason than you can do that by toggling the `IsEnabled` property on the `NetworkLogger` class.
-
 # Transports
 
 The currently implemented and available transports are:
@@ -264,6 +252,18 @@ Next there is 3 methods you will have to implement.
 - `OnSend(byte[] dataBuffer)` which is used for sending the data. You get a byte array which you will have to send through your method of choice. Further manipulation of this byte array is generally not needed.
 - `OnReceive(out byte[] dataBuffer)` which is used to check if you have data that you can read. You will have to set the `dataBuffer` variable before exiting the method. If you don't have enough bytes for a full message or the data is not ready to be send through you can leave this at `null`. The `dataBuffer` will always come prefixed with a length int and a message id int. You have to read the length data and remove it before passing it on. You need to leave the message id in there.
 - `OnClose()` which will execute the code to close this connection.
+
+# Logging
+
+UniNetworking comes with a custom logger. This is one of the additions made to keep this system independant from whatever platform it is used on.
+
+To enable logging simply register your preferred log methods by calling the `SetLogMethod()` method on the `NetworkLogger` class. This method takes two arguments. First an enum of type `LogLevel` which determines at which method should be used for which severity. And also a method that takes a string argument for the actual log method. The available levels are `Log`, `Warning` and `Error` and ideally should all be provided their own methods.
+
+```c#
+NetworkLogger.SetLogMethod(LogLevel.Log, Debug.Log);
+```
+
+If you need to disable logging for some reason than you can do that by toggling the `IsEnabled` property on the `NetworkLogger` class.
 
 # Contributing
 
