@@ -28,18 +28,6 @@ namespace JeeLee.UniNetworking.Logging
         }
 
         /// <summary>
-        /// Sets logging methods for multiple log levels.
-        /// </summary>
-        /// <param name="methods">An array of log level and logging method tuples.</param>
-        public static void SetLogMethods(params (LogLevel level, Action<string> method)[] methods)
-        {
-            foreach (var tuple in methods)
-            {
-                LogMethods.TryAdd(tuple.level, tuple.method);
-            }
-        }
-
-        /// <summary>
         /// Logs a message with the specified log level.
         /// </summary>
         /// <param name="message">The message to log.</param>
