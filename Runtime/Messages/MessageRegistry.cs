@@ -38,7 +38,7 @@ namespace JeeLee.UniNetworking.Messages
             TMessage message = GetMessage();
             message.Deserialize(dataStream);
 
-            NetworkLogger.Log(message);
+            NetworkLogger.Log($"{message} received");
 
             foreach (var handler in _handlers)
             {
