@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
 using JeeLee.UniNetworking.Messages.Streams;
@@ -110,7 +111,9 @@ namespace JeeLee.UniNetworking
             
             try
             {
-                foreach (var connection in _connections.Values)
+                var connections = _connections.Values.ToArray();
+                
+                foreach (var connection in connections)
                 {
                     connection.Close();
                 }
