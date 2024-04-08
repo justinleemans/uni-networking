@@ -76,6 +76,9 @@ namespace JeeLee.UniNetworking
             if (_connection != null)
             {
                 IsConnected = true;
+
+                NetworkLogger.Log("Client connected");
+
                 _connection.ConnectionClosed += Handle;
             }
 
@@ -85,6 +88,8 @@ namespace JeeLee.UniNetworking
             {
                 _connection.ConnectionClosed -= Handle;
                 _connection = null;
+
+                NetworkLogger.Log("Client disconnected");
 
                 ConnectionClosed?.Invoke();
             }

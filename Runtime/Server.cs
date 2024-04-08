@@ -82,12 +82,16 @@ namespace JeeLee.UniNetworking
         {
             if (IsRunning)
             {
+                NetworkLogger.Log("Server is already running", LogLevel.Warning);
+                
                 return true;
             }
 
             try
             {
                 _transport.Start();
+
+                NetworkLogger.Log("Server started");
 
                 return IsRunning = true;
             }
@@ -123,6 +127,8 @@ namespace JeeLee.UniNetworking
                 _lastUserId = 0;
 
                 _transport.Stop();
+
+                NetworkLogger.Log("Server stopped");
 
                 IsRunning = false;
             }
