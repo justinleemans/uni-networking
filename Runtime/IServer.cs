@@ -1,9 +1,28 @@
+using System;
 using JeeLee.UniNetworking.Messages;
 
 namespace JeeLee.UniNetworking
 {
+    /// <summary>
+    /// Represents the interface for the server peer. Runs the general server code which allows clients to connect to it.
+    /// </summary>
     public interface IServer : IPeer
     {
+        /// <summary>
+        /// Event triggered when a client connects to the server.
+        /// </summary>
+        event Action<int> ClientConnected;
+
+        /// <summary>
+        /// Event triggered when a client disconnects from the server.
+        /// </summary>
+        event Action<int> ClientDisconnected;
+
+        /// <summary>
+        /// Gets a value indicating whether the server is running.
+        /// </summary>
+        bool IsRunning { get; }
+        
         /// <summary>
         /// Starts the server.
         /// </summary>

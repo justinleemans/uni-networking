@@ -2,6 +2,9 @@ using JeeLee.UniNetworking.Messages;
 
 namespace JeeLee.UniNetworking
 {
+    /// <summary>
+    /// Represents the interface for the base class for network communication peers.
+    /// </summary>
     public interface IPeer
     {
         /// <summary>
