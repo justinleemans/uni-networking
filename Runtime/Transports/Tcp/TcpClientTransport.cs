@@ -8,8 +8,6 @@ namespace JeeLee.UniNetworking.Transports.Tcp
     /// </summary>
     public class TcpClientTransport : IClientTransport
     {
-        private Socket _socket;
-
         #region IClientTransport Members
 
         /// <summary>
@@ -29,10 +27,10 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         public Connection Connect()
         {
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse(IpAddress), Port);
-            _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            _socket.Connect(remoteEndPoint);
+            Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(remoteEndPoint);
 
-            return new TcpConnection(_socket);
+            return new TcpConnection(socket);
         }
 
         /// <summary>

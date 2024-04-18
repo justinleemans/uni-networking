@@ -62,7 +62,14 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         protected override void OnClose()
         {
-            _socket.Close();
+            try
+            {
+                _socket.Shutdown(SocketShutdown.Both);
+            }
+            catch
+            {
+                _socket.Close();
+            }
         }
 
         #endregion

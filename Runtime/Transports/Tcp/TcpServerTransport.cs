@@ -44,7 +44,14 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Stop()
         {
-            _socket.Close();
+            try
+            {
+                _socket.Shutdown(SocketShutdown.Both);
+            }
+            catch
+            {
+                _socket.Close();
+            }
         }
 
         /// <summary>
