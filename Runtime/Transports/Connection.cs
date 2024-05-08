@@ -27,6 +27,7 @@ namespace JeeLee.UniNetworking.Transports
             catch (Exception exception)
             {
                 NetworkLogger.Log(exception, LogLevel.Error);
+                Close();
             }
         }
 
@@ -51,6 +52,7 @@ namespace JeeLee.UniNetworking.Transports
             catch (Exception exception)
             {
                 NetworkLogger.Log(exception, LogLevel.Error);
+                Close();
             }
         }
 
