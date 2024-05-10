@@ -87,6 +87,8 @@ namespace JeeLee.UniNetworking
             void Handle()
             {
                 _connection.ConnectionClosed -= Handle;
+                
+                IsConnected = false;
                 _connection = null;
 
                 NetworkLogger.Log("Client disconnected");
