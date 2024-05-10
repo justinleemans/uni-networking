@@ -26,10 +26,9 @@ namespace JeeLee.UniNetworking.Messages
         {
             try
             {
-                var payload = new Payload();
+                var payload = new Payload(messageId);
                 
                 OnSerialize(payload);
-                payload.Sign(messageId);
 
                 return payload;
             }

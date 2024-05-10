@@ -47,7 +47,17 @@ namespace JeeLee.UniNetworking.Transports
                 }
 
                 Payload payload = new Payload(dataBuffer);
-                handler(payload);
+
+                switch (payload.Type)
+                {
+                    case PayloadType.Message:
+                        handler(payload);
+                        break;
+
+                    case PayloadType.Disconnect:
+                        Close();
+                        break;
+                }
             }
             catch (Exception exception)
             {

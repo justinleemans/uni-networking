@@ -15,10 +15,33 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         private int _pointer;
 
         /// <summary>
-        /// Constructor to create a new empty payload object.
+        /// The type of payload.
         /// </summary>
-        public Payload() : this(new List<byte>())
+        public PayloadType Type { get; }
+
+        /// <summary>
+        /// The id of the message this payload relates to.
+        /// </summary>
+        public int MessageId { get; }
+
+        /// <summary>
+        /// Constructor to create a new payload object with the specified payload type.
+        /// </summary>
+        /// <param name="type">The type of the payload.</param>
+        public Payload(PayloadType type) : this(new List<byte>())
         {
+            Type = type;
+        }
+
+        /// <summary>
+        /// Constructor to create a new payload object with the specified message identifier and payload type.
+        /// </summary>
+        /// <param name="messageId">The message identifier associated with the payload.</param>
+        /// <param name="type">The type of the payload.</param>
+        public Payload(int messageId, PayloadType type = default) : this(new List<byte>())
+        {
+            Type = type;
+            MessageId = messageId;
         }
 
         /// <summary>
@@ -29,6 +52,18 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         {
             _buffer = dataBuffer.ToList();
             _readableBuffer = _buffer.ToArray();
+
+            if (_buffer.Count <= 0)
+            {
+                return;
+            }
+
+            Type = (PayloadType)ReadInt();
+
+            if (Type == PayloadType.Message)
+            {
+                MessageId = ReadInt();
+            }
         }
 
         #region IWriteablePayload Members
@@ -175,19 +210,10 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         /// <returns>A byte array representation of the payload.</returns>
         public byte[] GetBytes()
         {
+            SignPayload();
+            
             _readableBuffer = _buffer.ToArray();
             return _readableBuffer;
-        }
-
-        /// <summary>
-        /// Signs this payload with a prefixed signature.
-        /// This signature consists of first the total message length without this length value itself and the message id.
-        /// </summary>
-        /// <param name="messageId"></param>
-        public void Sign(int messageId)
-        {
-            _buffer.InsertRange(0, BitConverter.GetBytes(messageId));
-            _buffer.InsertRange(0, BitConverter.GetBytes(_buffer.Count));
         }
 
         /// <summary>
@@ -198,6 +224,19 @@ namespace JeeLee.UniNetworking.Messages.Payloads
             _buffer = new List<byte>();
             _readableBuffer = _buffer.ToArray();
             _pointer = 0;
+        }
+
+        private void SignPayload()
+        {
+            switch (Type)
+            {
+                case PayloadType.Message:
+                _buffer.InsertRange(0, BitConverter.GetBytes(MessageId));
+                    break;
+            }
+
+            _buffer.InsertRange(0, BitConverter.GetBytes((int)Type));
+            _buffer.InsertRange(0, BitConverter.GetBytes(_buffer.Count));
         }
     }
 }
