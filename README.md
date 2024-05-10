@@ -62,6 +62,12 @@ server.ClientDisconnected += OnClientDisconnected;
 
 Both these events take a delegate with an integer as parameter which represents the connection id that has connected/disconnected.
 
+Finally the server class comes with a method that can be used to close connections remotely, on other words kick the player. This can be done by calling the `CloseConnection(connectionId)` method with the id of the connection you want to close.
+
+```c#
+server.CloseConnection(connectionId);
+```
+
 ## Connecting a client
 
 To connect a client to a server you will first need a client instance. This is practically the same as for the server.
