@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
-using JeeLee.UniNetworking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Payloads;
 using JeeLee.UniNetworking.Transports;
 using JeeLee.UniNetworking.Transports.Tcp;
 
@@ -55,10 +55,10 @@ namespace JeeLee.UniNetworking
         #region Peer Members
 
         /// <summary>
-        /// Sends a data stream to the peer.
+        /// Sends a payload to the peer.
         /// </summary>
-        /// <param name="dataStream">The data stream to be sent.</param>
-        protected override void SendDataStream(DataStream dataStream)
+        /// <param name="payload">The payload to be sent.</param>
+        protected override void SendPayload(Payload payload)
         {
             if (!IsRunning)
             {
@@ -67,7 +67,7 @@ namespace JeeLee.UniNetworking
 
             foreach (var connection in _connections.Values)
             {
-                connection.Send(dataStream);
+                connection.Send(payload);
             }
         }
 
@@ -176,11 +176,11 @@ namespace JeeLee.UniNetworking
             try
             {
                 int messageId = RegisterMessageId<TMessage>();
-                DataStream dataStream = message.Serialize(messageId);
+                Payload payload = message.Serialize(messageId);
 
-                if (dataStream != null && _connections.TryGetValue(connectionId, out var connection))
+                if (payload != null && _connections.TryGetValue(connectionId, out var connection))
                 {
-                    connection.Send(dataStream);
+                    connection.Send(payload);
                 }
             }
             catch (Exception exception)
@@ -227,7 +227,7 @@ namespace JeeLee.UniNetworking
 
             foreach (var connection in _connections)
             {
-                connection.Value.Receive(dataStream => OnMessageReceived(connection.Key, dataStream));
+                connection.Value.Receive(payload => OnMessageReceived(connection.Key, payload));
             }
         }
 

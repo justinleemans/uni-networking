@@ -1,32 +1,32 @@
 using System.Text;
 
-namespace JeeLee.UniNetworking.Messages.Streams
+namespace JeeLee.UniNetworking.Messages.Payloads
 {
     /// <summary>
-    /// Interface for writing to a data stream object.
+    /// Interface for writing to a payload object.
     /// </summary>
-    public interface IWriteDataStream
+    public interface IWriteablePayload
     {
         /// <summary>
-        /// Writes a boolean to this data stream.
+        /// Writes a boolean to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         void WriteBool(bool value);
 
         /// <summary>
-        /// Writes a float to this data stream.
+        /// Writes a float to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         void WriteFloat(float value);
 
         /// <summary>
-        /// Writes an integer to this data stream.
+        /// Writes an integer to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         void WriteInt(int value);
 
         /// <summary>
-        /// Writes a string to this data stream.
+        /// Writes a string to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <param name="encoding">The encoding object to use for this string.</param>

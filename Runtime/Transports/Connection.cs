@@ -1,6 +1,6 @@
 using System;
 using JeeLee.UniNetworking.Logging;
-using JeeLee.UniNetworking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Payloads;
 
 namespace JeeLee.UniNetworking.Transports
 {
@@ -15,14 +15,14 @@ namespace JeeLee.UniNetworking.Transports
         public event Action ConnectionClosed;
 
         /// <summary>
-        /// Sends a data stream to the connected peer.
+        /// Sends a payload to the connected peer.
         /// </summary>
-        /// <param name="dataStream">The data stream to be sent.</param>
-        public void Send(DataStream dataStream)
+        /// <param name="payload">The payload to be sent.</param>
+        public void Send(Payload payload)
         {
             try
             {
-                OnSend(dataStream.GetBytes());
+                OnSend(payload.GetBytes());
             }
             catch (Exception exception)
             {
@@ -35,7 +35,7 @@ namespace JeeLee.UniNetworking.Transports
         /// Receives data from the connected peer and invokes the provided handler.
         /// </summary>
         /// <param name="handler">The handler to process the received data.</param>
-        public void Receive(Action<DataStream> handler)
+        public void Receive(Action<Payload> handler)
         {
             try
             {
@@ -46,8 +46,8 @@ namespace JeeLee.UniNetworking.Transports
                     return;
                 }
 
-                DataStream dataStream = new DataStream(dataBuffer);
-                handler(dataStream);
+                Payload payload = new Payload(dataBuffer);
+                handler(payload);
             }
             catch (Exception exception)
             {

@@ -1,6 +1,6 @@
 using System;
 using JeeLee.UniNetworking.Logging;
-using JeeLee.UniNetworking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Payloads;
 using JeeLee.UniNetworking.Transports;
 using JeeLee.UniNetworking.Transports.Tcp;
 
@@ -44,17 +44,17 @@ namespace JeeLee.UniNetworking
         #region Peer Members
 
         /// <summary>
-        /// Sends a data stream to the peer.
+        /// Sends a payload to the peer.
         /// </summary>
-        /// <param name="dataStream">The data stream to be sent.</param>
-        protected override void SendDataStream(DataStream dataStream)
+        /// <param name="payload">The payload to be sent.</param>
+        protected override void SendPayload(Payload payload)
         {
             if (!IsConnected)
             {
                 return;
             }
 
-            _connection.Send(dataStream);
+            _connection.Send(payload);
         }
 
         #endregion
@@ -122,7 +122,7 @@ namespace JeeLee.UniNetworking
             }
 
             _transport.Tick();
-            _connection.Receive(dataStream => OnMessageReceived(-1, dataStream));
+            _connection.Receive(payload => OnMessageReceived(-1, payload));
         }
 
         #endregion

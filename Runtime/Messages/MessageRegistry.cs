@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JeeLee.UniNetworking.Logging;
-using JeeLee.UniNetworking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Payloads;
 
 namespace JeeLee.UniNetworking.Messages
 {
@@ -30,13 +30,13 @@ namespace JeeLee.UniNetworking.Messages
         /// Handles a received message.
         /// </summary>
         /// <param name="connectionId">The identifier of the connection from which the message is received.</param>
-        /// <param name="dataStream">The data stream containing the received message.</param>
-        public void Handle(int connectionId, DataStream dataStream)
+        /// <param name="payload">The payload containing the received message.</param>
+        public void Handle(int connectionId, Payload payload)
         {
             _isProcessing = true;
 
             TMessage message = GetMessage();
-            message.Deserialize(dataStream);
+            message.Deserialize(payload);
 
             NetworkLogger.Log($"{message.GetType().Name} received");
 

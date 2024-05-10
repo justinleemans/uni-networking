@@ -120,25 +120,25 @@ public override void OnClear()
 }
 ```
 
-Besides the `OnClear()` method two other overridable methods have been added. `OnSerialize(IWriteDataStream dataStream)` and `OnDeserialize(IReadDataStream dataStream)`. These methods are used to read/write the values of fields and properties to/from the data stream.
+Besides the `OnClear()` method two other overridable methods have been added. `OnSerialize(IWriteablePayload payload)` and `OnDeserialize(IReadablePayload payload)`. These methods are used to read/write the values of fields and properties to/from the data stream.
 
 ```c#
-public override void OnSerialize(IWriteDataStream dataStream)
+public override void OnSerialize(IWriteablePayload payload)
 {
-    dataStream.WriteBool(boolVariable);
-    dataStream.WriteFloat(floatVariable);
-    dataStream.WriteInt(intVariable);
-    dataStream.WriteString(stringVariable);
+    payload.WriteBool(boolVariable);
+    payload.WriteFloat(floatVariable);
+    payload.WriteInt(intVariable);
+    payload.WriteString(stringVariable);
 }
 ```
 
 ```c#
-public override void OnDeserialize(IReadDataStream dataStream)
+public override void OnDeserialize(IReadablePayload payload)
 {
-    boolVariable = dataStream.ReadBool();
-    floatVariable = dataStream.ReadFloat();
-    intVariable = dataStream.ReadInt();
-    stringVariable = dataStream.ReadString();
+    boolVariable = payload.ReadBool();
+    floatVariable = payload.ReadFloat();
+    intVariable = payload.ReadInt();
+    stringVariable = payload.ReadString();
 }
 ```
 

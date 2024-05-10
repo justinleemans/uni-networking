@@ -4,7 +4,7 @@ using System.Reflection;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
 using JeeLee.UniNetworking.Messages.Attributes;
-using JeeLee.UniNetworking.Messages.Streams;
+using JeeLee.UniNetworking.Messages.Payloads;
 
 namespace JeeLee.UniNetworking
 {
@@ -39,11 +39,11 @@ namespace JeeLee.UniNetworking
             try
             {
                 int messageId = RegisterMessageId<TMessage>();
-                DataStream dataStream = message.Serialize(messageId);
+                Payload payload = message.Serialize(messageId);
             
-                if (dataStream != null)
+                if (payload != null)
                 {
-                    SendDataStream(dataStream);
+                    SendPayload(payload);
                 }
             }
             catch (Exception exception)
@@ -90,26 +90,26 @@ namespace JeeLee.UniNetworking
         #endregion
 
         /// <summary>
-        /// Sends a data stream to the peer.
+        /// Sends a payload to the peer.
         /// </summary>
-        /// <param name="dataStream">The data stream to be sent.</param>
-        protected abstract void SendDataStream(DataStream dataStream);
+        /// <param name="payload">The payload to be sent.</param>
+        protected abstract void SendPayload(Payload payload);
 
         /// <summary>
         /// Called when a message is received, allowing the peer to handle the incoming message.
         /// </summary>
         /// <param name="connectionId">The connection identifier.</param>
-        /// <param name="dataStream">The data stream containing the received message.</param>
-        protected void OnMessageReceived(int connectionId, DataStream dataStream)
+        /// <param name="payload">The payload containing the received message.</param>
+        protected void OnMessageReceived(int connectionId, Payload payload)
         {
-            int messageId = dataStream.ReadInt();
+            int messageId = payload.ReadInt();
 
             if (!_messageRegistries.TryGetValue(messageId, out var registry))
             {
                 return;
             }
 
-            registry.Handle(connectionId, dataStream);
+            registry.Handle(connectionId, payload);
         }
 
         /// <summary>

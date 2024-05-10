@@ -3,38 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace JeeLee.UniNetworking.Messages.Streams
+namespace JeeLee.UniNetworking.Messages.Payloads
 {
     /// <summary>
     /// The data container used to translate network messages.
     /// </summary>
-    public sealed class DataStream : IWriteDataStream, IReadDataStream
+    public sealed class Payload : IWriteablePayload, IReadablePayload
     {
         private List<byte> _buffer;
         private byte[] _readableBuffer;
         private int _pointer;
 
         /// <summary>
-        /// Constructor to create a new empty data stream object.
+        /// Constructor to create a new empty payload object.
         /// </summary>
-        public DataStream() : this(new List<byte>())
+        public Payload() : this(new List<byte>())
         {
         }
 
         /// <summary>
-        /// Constructor to create a new data stream object using the given data buffer.
+        /// Constructor to create a new payload object using the given data buffer.
         /// </summary>
-        /// <param name="dataBuffer">The data to insert into this data stream object upon creation.</param>
-        public DataStream(IEnumerable<byte> dataBuffer)
+        /// <param name="dataBuffer">The data to insert into this payload object upon creation.</param>
+        public Payload(IEnumerable<byte> dataBuffer)
         {
             _buffer = dataBuffer.ToList();
             _readableBuffer = _buffer.ToArray();
         }
 
-        #region IWriteDataStream Members
+        #region IWriteablePayload Members
 
         /// <summary>
-        /// Writes a boolean to this data stream.
+        /// Writes a boolean to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         public void WriteBool(bool value)
@@ -43,7 +43,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Writes a float to this data stream.
+        /// Writes a float to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         public void WriteFloat(float value)
@@ -52,7 +52,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Writes an integer to this data stream.
+        /// Writes an integer to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         public void WriteInt(int value)
@@ -61,7 +61,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Writes a string to this data stream.
+        /// Writes a string to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <param name="encoding">The encoding object to use for this string.</param>
@@ -73,13 +73,13 @@ namespace JeeLee.UniNetworking.Messages.Streams
 
         #endregion
 
-        #region IReadDataStream Members
+        #region IReadablePayload Members
 
         /// <summary>
-        /// Reads a boolean value from this data stream.
+        /// Reads a boolean value from this payload.
         /// </summary>
         /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
-        /// <returns>The boolean value read from the data stream.</returns>
+        /// <returns>The boolean value read from the payload.</returns>
         public bool ReadBool(bool movePointer = true)
         {
             if (_pointer > _buffer.Count)
@@ -98,10 +98,10 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Reads a float value from this data stream.
+        /// Reads a float value from this payload.
         /// </summary>
         /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
-        /// <returns>The flaot value read from the data stream.</returns>
+        /// <returns>The flaot value read from the payload.</returns>
         public float ReadFloat(bool movePointer = true)
         {
             if (_pointer > _buffer.Count)
@@ -120,10 +120,10 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Reads an integer value from this data stream.
+        /// Reads an integer value from this payload.
         /// </summary>
         /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
-        /// <returns>The integer value read from the data stream.</returns>
+        /// <returns>The integer value read from the payload.</returns>
         public int ReadInt(bool movePointer = true)
         {
             if (_pointer > _buffer.Count)
@@ -142,11 +142,11 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Reads a string value from this data stream.
+        /// Reads a string value from this payload.
         /// </summary>
         /// <param name="encoding">The encoding object to use for this string.</param>
         /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
-        /// <returns>The string value read from the data stream.</returns>
+        /// <returns>The string value read from the payload.</returns>
         public string ReadString(Encoding encoding = null, bool movePointer = true)
         {
             try
@@ -170,9 +170,9 @@ namespace JeeLee.UniNetworking.Messages.Streams
         #endregion
 
         /// <summary>
-        /// Gets the bytes form this data stream object.
+        /// Gets the bytes form this payload object.
         /// </summary>
-        /// <returns>A byte array representation of the data stream.</returns>
+        /// <returns>A byte array representation of the payload.</returns>
         public byte[] GetBytes()
         {
             _readableBuffer = _buffer.ToArray();
@@ -180,7 +180,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Signs this data stream with a prefixed signature.
+        /// Signs this payload with a prefixed signature.
         /// This signature consists of first the total message length without this length value itself and the message id.
         /// </summary>
         /// <param name="messageId"></param>
@@ -191,7 +191,7 @@ namespace JeeLee.UniNetworking.Messages.Streams
         }
 
         /// <summary>
-        /// Resets this data stream object to a neutral and reusable state.
+        /// Resets this payload object to a neutral and reusable state.
         /// </summary>
         public void Reset()
         {
