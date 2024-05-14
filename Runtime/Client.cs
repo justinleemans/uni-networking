@@ -108,8 +108,6 @@ namespace JeeLee.UniNetworking
             }
             
             _transport.Disconnect();
-
-            _connection.Send(new Payload(PayloadType.Disconnect));
             _connection.Close();
 
             IsConnected = false;

@@ -71,6 +71,7 @@ namespace JeeLee.UniNetworking.Transports
         /// </summary>
         public void Close()
         {
+            Send(new Payload(PayloadType.Disconnect));
             OnClose();
             ConnectionClosed?.Invoke();
         }

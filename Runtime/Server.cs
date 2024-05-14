@@ -149,7 +149,6 @@ namespace JeeLee.UniNetworking
                 return;
             }
 
-            connection.Send(new Payload(PayloadType.Disconnect));
             connection.Close();
         }
 
