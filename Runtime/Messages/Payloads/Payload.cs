@@ -87,6 +87,15 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         }
 
         /// <summary>
+        /// Writes a short to this payload.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteShort(short value)
+        {
+            _buffer.AddRange(BitConverter.GetBytes(value));
+        }
+
+        /// <summary>
         /// Writes an integer to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>
@@ -149,6 +158,28 @@ namespace JeeLee.UniNetworking.Messages.Payloads
             if (movePointer)
             {
                 _pointer += sizeof(float);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Reads a short value from this payload.
+        /// </summary>
+        /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
+        /// <returns>The short value read from the payload.</returns>
+        public short ReadShort(bool movePointer = true)
+        {
+            if (_pointer > _buffer.Count)
+            {
+                throw new Exception("Pointer overflow, trying to read data(short) past end of buffer");
+            }
+
+            short value = BitConverter.ToInt16(_readableBuffer, _pointer);
+
+            if (movePointer)
+            {
+                _pointer += sizeof(short);
             }
 
             return value;

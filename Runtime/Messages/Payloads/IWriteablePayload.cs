@@ -20,6 +20,12 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         void WriteFloat(float value);
 
         /// <summary>
+        /// Writes a short to this payload.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        void WriteShort(short value);
+
+        /// <summary>
         /// Writes an integer to this payload.
         /// </summary>
         /// <param name="value">The value to write.</param>

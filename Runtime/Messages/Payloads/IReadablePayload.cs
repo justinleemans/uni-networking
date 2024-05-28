@@ -22,6 +22,13 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         float ReadFloat(bool movePointer = true);
 
         /// <summary>
+        /// Reads a short value from this payload.
+        /// </summary>
+        /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
+        /// <returns>The short value read from the payload.</returns>
+        short ReadShort(bool movePointer = true);
+
+        /// <summary>
         /// Reads an integer value from this payload.
         /// </summary>
         /// <param name="movePointer">Should the pointer be moved after reading the value.</param>
