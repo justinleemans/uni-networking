@@ -22,7 +22,7 @@ namespace JeeLee.UniNetworking.Messages
         /// </summary>
         /// <param name="messageId">The ID assigned to the message.</param>
         /// <returns>The serialized message as a payload.</returns>
-        internal Payload Serialize(int messageId)
+        internal Payload Serialize(short messageId)
         {
             try
             {

@@ -175,7 +175,7 @@ namespace JeeLee.UniNetworking
         {
             try
             {
-                int messageId = RegisterMessageId<TMessage>();
+                short messageId = RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
 
                 if (payload != null && _connections.TryGetValue(connectionId, out var connection))

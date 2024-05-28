@@ -11,13 +11,13 @@ namespace JeeLee.UniNetworking.Messages.Attributes
         /// <summary>
         /// Gets the message id assigned to this message.
         /// </summary>
-        public int MessageId { get; private set; }
+        public short MessageId { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessageAttribute"/> class with the specified message id.
         /// </summary>
         /// <param name="messageId">The unique identifier assigned to this message.</param>
-        public MessageAttribute(int messageId)
+        public MessageAttribute(short messageId)
         {
             MessageId = messageId;
         }

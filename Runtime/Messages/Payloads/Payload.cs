@@ -22,7 +22,7 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         /// <summary>
         /// The id of the message this payload relates to.
         /// </summary>
-        public int MessageId { get; }
+        public short MessageId { get; }
 
         /// <summary>
         /// Constructor to create a new payload object with the specified payload type.
@@ -38,7 +38,7 @@ namespace JeeLee.UniNetworking.Messages.Payloads
         /// </summary>
         /// <param name="messageId">The message identifier associated with the payload.</param>
         /// <param name="type">The type of the payload.</param>
-        public Payload(int messageId, PayloadType type = default) : this(new List<byte>())
+        public Payload(short messageId, PayloadType type = PayloadType.Message) : this(new List<byte>())
         {
             Type = type;
             MessageId = messageId;
@@ -58,11 +58,11 @@ namespace JeeLee.UniNetworking.Messages.Payloads
                 return;
             }
 
-            Type = (PayloadType)ReadInt();
+            Type = (PayloadType)ReadShort();
 
             if (Type == PayloadType.Message)
             {
-                MessageId = ReadInt();
+                MessageId = ReadShort();
             }
         }
 
@@ -266,7 +266,7 @@ namespace JeeLee.UniNetworking.Messages.Payloads
                     break;
             }
 
-            _buffer.InsertRange(0, BitConverter.GetBytes((int)Type));
+            _buffer.InsertRange(0, BitConverter.GetBytes((short)Type));
             _buffer.InsertRange(0, BitConverter.GetBytes(_buffer.Count));
         }
     }

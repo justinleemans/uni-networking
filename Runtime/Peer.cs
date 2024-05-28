@@ -13,8 +13,8 @@ namespace JeeLee.UniNetworking
     /// </summary>
     public abstract class Peer : IPeer
     {
-        private readonly Dictionary<int, IMessageRegistry> _messageRegistries = new Dictionary<int, IMessageRegistry>();
-        private readonly Dictionary<Type, int> _messageIdMap = new Dictionary<Type, int>();
+        private readonly Dictionary<short, IMessageRegistry> _messageRegistries = new Dictionary<short, IMessageRegistry>();
+        private readonly Dictionary<Type, short> _messageIdMap = new Dictionary<Type, short>();
 
         #region IPeer Members
 
@@ -38,7 +38,7 @@ namespace JeeLee.UniNetworking
         {
             try
             {
-                int messageId = RegisterMessageId<TMessage>();
+                short messageId = RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
             
                 if (payload != null)
@@ -102,9 +102,7 @@ namespace JeeLee.UniNetworking
         /// <param name="payload">The payload containing the received message.</param>
         protected void OnMessageReceived(int connectionId, Payload payload)
         {
-            int messageId = payload.ReadInt();
-
-            if (!_messageRegistries.TryGetValue(messageId, out var registry))
+            if (!_messageRegistries.TryGetValue(payload.MessageId, out var registry))
             {
                 return;
             }
@@ -122,7 +120,7 @@ namespace JeeLee.UniNetworking
         {
             try
             {
-                int messageId = RegisterMessageId<TMessage>();
+                short messageId = RegisterMessageId<TMessage>();
             
                 if (!_messageRegistries.TryGetValue(messageId, out var registry))
                 {
@@ -144,7 +142,7 @@ namespace JeeLee.UniNetworking
         /// </summary>
         /// <typeparam name="TMessage">The type of message for which to register and retrieve the identifier.</typeparam>
         /// <returns>The message identifier for the specified message type.</returns>
-        protected int RegisterMessageId<TMessage>()
+        protected short RegisterMessageId<TMessage>()
             where TMessage : Message
         {
             if (!_messageIdMap.TryGetValue(typeof(TMessage), out var messageId))
