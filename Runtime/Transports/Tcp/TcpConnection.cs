@@ -1,13 +1,20 @@
 using System;
 using System.Net.Sockets;
+using JeeLee.UniNetworking.Logging;
+using JeeLee.UniNetworking.Payloads;
 
 namespace JeeLee.UniNetworking.Transports.Tcp
 {
     /// <summary>
-    /// Represents a TCP connection implementation based on the Connection abstract class.
+    /// Represents a TCP connection implementation.
     /// </summary>
-    public class TcpConnection : Connection
+    public class TcpConnection
     {
+        /// <summary>
+        /// Event triggered when the connection is closed.
+        /// </summary>
+        public event Action ConnectionClosed;
+        
         private readonly Socket _socket;
         private readonly byte[] _sizeBuffer = new byte[sizeof(int)];
 
@@ -22,56 +29,79 @@ namespace JeeLee.UniNetworking.Transports.Tcp
             _socket = socket;
         }
 
-        #region Connection Members
-
         /// <summary>
-        /// Sends a byte array to the connected peer using the underlying Socket.
+        /// Sends a payload to the connected peer.
         /// </summary>
-        /// <param name="dataBuffer">The byte array to be sent.</param>
-        protected override void OnSend(byte[] dataBuffer)
+        /// <param name="payload">The payload to be sent.</param>
+        public void Send(Payload payload)
         {
-            _socket.Send(dataBuffer, SocketFlags.None);
-        }
-
-        /// <summary>
-        /// Receives a byte array from the connected peer using the underlying Socket.
-        /// </summary>
-        /// <param name="dataBuffer">The received byte array.</param>
-        protected override void OnReceive(out byte[] dataBuffer)
-        {
-            if (_nextMessageSize <= 0 && _socket.Available >= sizeof(int))
+            try
             {
-                _socket.Receive(_sizeBuffer, sizeof(int), SocketFlags.None);
-                _nextMessageSize = BitConverter.ToInt32(_sizeBuffer);
+                _socket.Send(payload.GetBytes(), SocketFlags.None);
             }
-
-            if (_nextMessageSize > 0 && _socket.Available >= _nextMessageSize)
+            catch (Exception exception)
             {
-                dataBuffer = new byte[_nextMessageSize];
-                _socket.Receive(dataBuffer, _nextMessageSize, SocketFlags.None);
-                _nextMessageSize = 0;
-            }
-            else
-            {
-                dataBuffer = null;
+                NetworkLogger.Log(exception, LogLevel.Error);
+                Close();
             }
         }
 
         /// <summary>
-        /// Closes the connection by closing the underlying Socket.
+        /// Receives data from the connected peer and invokes the provided handler.
         /// </summary>
-        protected override void OnClose()
+        /// <param name="handler">The handler to process the received data.</param>
+        public void Receive(Action<Payload> handler)
+        {
+            try
+            {
+                byte[] dataBuffer = null;
+                if (_nextMessageSize <= 0 && _socket.Available >= sizeof(int))
+                {
+                    _socket.Receive(_sizeBuffer, sizeof(int), SocketFlags.None);
+                    _nextMessageSize = BitConverter.ToInt32(_sizeBuffer);
+                }
+            
+                if (_nextMessageSize > 0 && _socket.Available >= _nextMessageSize)
+                {
+                    dataBuffer = new byte[_nextMessageSize];
+                    _socket.Receive(dataBuffer, _nextMessageSize, SocketFlags.None);
+                    _nextMessageSize = 0;
+                }
+                
+                if (dataBuffer == null || dataBuffer.Length < sizeof(int))
+                {
+                    return;
+                }
+
+                Payload payload = new Payload(dataBuffer);
+
+                handler(payload);
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+                Close();
+            }
+        }
+
+        /// <summary>
+        /// Closes the connection.
+        /// </summary>
+        public void Close()
         {
             try
             {
                 _socket.Shutdown(SocketShutdown.Both);
             }
-            catch
+            catch (Exception exception)
             {
+                NetworkLogger.Log(exception, LogLevel.Error);
                 _socket.Close();
             }
+            finally
+            {
+                ConnectionClosed?.Invoke();
+            }
         }
-
-        #endregion
     }
 }
