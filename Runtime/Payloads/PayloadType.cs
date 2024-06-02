@@ -1,4 +1,4 @@
-namespace JeeLee.UniNetworking.Messages.Payloads
+namespace JeeLee.UniNetworking.Payloads
 {
     /// <summary>
     /// Represents the type of payload used in network communications.

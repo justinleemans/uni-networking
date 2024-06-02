@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
-using JeeLee.UniNetworking.Messages.Payloads;
+using JeeLee.UniNetworking.Payloads;
 using JeeLee.UniNetworking.Transports;
 using JeeLee.UniNetworking.Transports.Tcp;
 
-namespace JeeLee.UniNetworking
+namespace JeeLee.UniNetworking.Peers
 {
     /// <summary>
     /// Server peer. Runs the general server code which allows clients to connect to it.

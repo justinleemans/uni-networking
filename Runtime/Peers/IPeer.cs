@@ -1,6 +1,6 @@
 using JeeLee.UniNetworking.Messages;
 
-namespace JeeLee.UniNetworking
+namespace JeeLee.UniNetworking.Peers
 {
     /// <summary>
     /// Represents the interface for the base class for network communication peers.

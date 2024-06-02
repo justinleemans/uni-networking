@@ -4,9 +4,9 @@ using System.Reflection;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
 using JeeLee.UniNetworking.Messages.Attributes;
-using JeeLee.UniNetworking.Messages.Payloads;
+using JeeLee.UniNetworking.Payloads;
 
-namespace JeeLee.UniNetworking
+namespace JeeLee.UniNetworking.Peers
 {
     /// <summary>
     /// The base class for network communication peers.

@@ -1,6 +1,6 @@
 using System;
 
-namespace JeeLee.UniNetworking
+namespace JeeLee.UniNetworking.Peers
 {
     /// <summary>
     /// Represents the interface for the client peer. Runs the general client code which allows a connection to be made to a server peer.

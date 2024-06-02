@@ -1,10 +1,10 @@
 using System;
 using JeeLee.UniNetworking.Logging;
-using JeeLee.UniNetworking.Messages.Payloads;
+using JeeLee.UniNetworking.Payloads;
 using JeeLee.UniNetworking.Transports;
 using JeeLee.UniNetworking.Transports.Tcp;
 
-namespace JeeLee.UniNetworking
+namespace JeeLee.UniNetworking.Peers
 {
     /// <summary>
     /// Client peer. Runs the general client code which allows a connection to be made to a server peer.

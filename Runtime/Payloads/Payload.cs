@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace JeeLee.UniNetworking.Messages.Payloads
+namespace JeeLee.UniNetworking.Payloads
 {
     /// <summary>
     /// The data container used to translate network messages.

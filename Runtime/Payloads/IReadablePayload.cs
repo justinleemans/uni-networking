@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace JeeLee.UniNetworking.Messages.Payloads
+namespace JeeLee.UniNetworking.Payloads
 {
     /// <summary>
     /// Interface for reading data from a payload object.

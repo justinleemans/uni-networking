@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JeeLee.UniNetworking.Logging;
-using JeeLee.UniNetworking.Messages.Payloads;
+using JeeLee.UniNetworking.Payloads;
 
 namespace JeeLee.UniNetworking.Messages
 {
