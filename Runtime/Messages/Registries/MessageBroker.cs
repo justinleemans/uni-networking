@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Payloads;
 
-namespace JeeLee.UniNetworking.Messages
+namespace JeeLee.UniNetworking.Messages.Registries
 {
     /// <summary>
-    /// Represents a registry for messages of type <typeparamref name="TMessage"/> in the network communication system.
+    /// Represents a container for messages of type <typeparamref name="TMessage"/> in the network communication system.
     /// </summary>
-    /// <typeparam name="TMessage">The type of messages handled by the registry.</typeparam>
-    public sealed class MessageRegistry<TMessage> : IMessageRegistry
+    /// <typeparam name="TMessage">The type of messages handled by the container.</typeparam>
+    public sealed class MessageBroker<TMessage> : IMessageBroker
         where TMessage : Message
     {
         private readonly Queue<TMessage> _pool = new Queue<TMessage>();
@@ -24,7 +24,7 @@ namespace JeeLee.UniNetworking.Messages
 
         private bool _isProcessing;
 
-        #region IMessageRegistry Members
+        #region IMessageBroker Members
 
         /// <summary>
         /// Handles a received message.

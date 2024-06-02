@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Messages;
-using JeeLee.UniNetworking.Messages.Attributes;
+using JeeLee.UniNetworking.Messages.Registries;
 using JeeLee.UniNetworking.Payloads;
 
 namespace JeeLee.UniNetworking.Peers
@@ -13,8 +11,7 @@ namespace JeeLee.UniNetworking.Peers
     /// </summary>
     public abstract class Peer : IPeer
     {
-        private readonly Dictionary<short, IMessageRegistry> _messageRegistries = new Dictionary<short, IMessageRegistry>();
-        private readonly Dictionary<Type, short> _messageIdMap = new Dictionary<Type, short>();
+        protected IMessageRegistry MessageRegistry { get; } = new MessageRegistry();
 
         #region IPeer Members
 
@@ -38,7 +35,7 @@ namespace JeeLee.UniNetworking.Peers
         {
             try
             {
-                short messageId = RegisterMessageId<TMessage>();
+                short messageId = MessageRegistry.RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
             
                 if (payload != null)
@@ -51,7 +48,7 @@ namespace JeeLee.UniNetworking.Peers
                 NetworkLogger.Log(exception, LogLevel.Error);
             }
 
-            AllocateMessageRegistry<TMessage>()?.ReleaseMessage(message);
+            MessageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
         }
 
         /// <summary>
@@ -62,7 +59,7 @@ namespace JeeLee.UniNetworking.Peers
         public TMessage GetMessage<TMessage>()
             where TMessage : Message
         {
-            return AllocateMessageRegistry<TMessage>()?.GetMessage();
+            return MessageRegistry.AllocateMessageBroker<TMessage>()?.GetMessage();
         }
 
         /// <summary>
@@ -73,7 +70,7 @@ namespace JeeLee.UniNetworking.Peers
         public void Subscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>()?.AddHandler(handler);
+            MessageRegistry.AllocateMessageBroker<TMessage>()?.AddHandler(handler);
         }
 
         /// <summary>
@@ -84,7 +81,7 @@ namespace JeeLee.UniNetworking.Peers
         public void Unsubscribe<TMessage>(MessageHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>()?.RemoveHandler(handler);
+            MessageRegistry.AllocateMessageBroker<TMessage>()?.RemoveHandler(handler);
         }
 
         #endregion
@@ -102,62 +99,12 @@ namespace JeeLee.UniNetworking.Peers
         /// <param name="payload">The payload containing the received message.</param>
         protected void OnMessageReceived(int connectionId, Payload payload)
         {
-            if (!_messageRegistries.TryGetValue(payload.MessageId, out var registry))
+            if (!MessageRegistry.MessageBrokers.TryGetValue(payload.MessageId, out var registry))
             {
                 return;
             }
 
             registry.Handle(connectionId, payload);
-        }
-
-        /// <summary>
-        /// Allocates or retrieves the message registry for a specific message type.
-        /// </summary>
-        /// <typeparam name="TMessage">The type of message for which to allocate or retrieve the registry.</typeparam>
-        /// <returns>The message registry for the specified message type.</returns>
-        protected MessageRegistry<TMessage> AllocateMessageRegistry<TMessage>()
-            where TMessage : Message
-        {
-            try
-            {
-                short messageId = RegisterMessageId<TMessage>();
-            
-                if (!_messageRegistries.TryGetValue(messageId, out var registry))
-                {
-                    _messageRegistries.Add(messageId, registry = new MessageRegistry<TMessage>());
-                }
-
-                return (MessageRegistry<TMessage>)registry;
-            }
-            catch (Exception exception)
-            {
-                NetworkLogger.Log(exception, LogLevel.Error);
-                
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Registers and retrieves the message identifier for a specific message type.
-        /// </summary>
-        /// <typeparam name="TMessage">The type of message for which to register and retrieve the identifier.</typeparam>
-        /// <returns>The message identifier for the specified message type.</returns>
-        protected short RegisterMessageId<TMessage>()
-            where TMessage : Message
-        {
-            if (!_messageIdMap.TryGetValue(typeof(TMessage), out var messageId))
-            {
-                MessageAttribute messageAttribute = typeof(TMessage).GetCustomAttribute(typeof(MessageAttribute)) as MessageAttribute;
-
-                if (messageAttribute == null)
-                {
-                    throw new Exception("Could not bind message, message id not found");
-                }
-
-                _messageIdMap.Add(typeof(TMessage), messageId = messageAttribute.MessageId);
-            }
-
-            return messageId;
         }
     }
 }

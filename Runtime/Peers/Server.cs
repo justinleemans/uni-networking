@@ -175,7 +175,7 @@ namespace JeeLee.UniNetworking.Peers
         {
             try
             {
-                short messageId = RegisterMessageId<TMessage>();
+                short messageId = MessageRegistry.RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
 
                 if (payload != null && _connections.TryGetValue(connectionId, out var connection))
@@ -188,7 +188,7 @@ namespace JeeLee.UniNetworking.Peers
                 NetworkLogger.Log(exception, LogLevel.Error);
             }
 
-            AllocateMessageRegistry<TMessage>()?.ReleaseMessage(message);
+            MessageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace JeeLee.UniNetworking.Peers
         public void Subscribe<TMessage>(MessageFromHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>()?.AddHandler(handler);
+            MessageRegistry.AllocateMessageBroker<TMessage>()?.AddHandler(handler);
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace JeeLee.UniNetworking.Peers
         public void Unsubscribe<TMessage>(MessageFromHandler<TMessage> handler)
             where TMessage : Message
         {
-            AllocateMessageRegistry<TMessage>()?.RemoveHandler(handler);
+            MessageRegistry.AllocateMessageBroker<TMessage>()?.RemoveHandler(handler);
         }
 
         /// <summary>

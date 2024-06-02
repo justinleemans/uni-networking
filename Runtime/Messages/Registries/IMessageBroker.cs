@@ -1,11 +1,11 @@
 using JeeLee.UniNetworking.Payloads;
 
-namespace JeeLee.UniNetworking.Messages
+namespace JeeLee.UniNetworking.Messages.Registries
 {
     /// <summary>
-    /// Represents the interface for a message registry in the network communication system.
+    /// Represents the interface for a message broker in the network communication system.
     /// </summary>
-    public interface IMessageRegistry
+    public interface IMessageBroker
     {
         /// <summary>
         /// Handles a received message.
