@@ -38,8 +38,6 @@ namespace JeeLee.UniNetworking.Messages.Registries
             TMessage message = GetMessage();
             message.Deserialize(payload);
 
-            NetworkLogger.Log($"{message.GetType().Name} received");
-
             foreach (var handler in _handlers)
             {
                 handler?.Invoke(message);
