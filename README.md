@@ -40,8 +40,8 @@ This package can be used to create a client-host setup where one of the clients 
 To run a server you simply first have to create a server instance. When creating a server instance you have the option to choose a transport layer by passing a transport layer instance in the constructor. Currently the default transport layer is TCP. For more info on transports take a look at [transports](#transports).
 
 ```c#
-Server server = new Server();
-Server server = new Server(new TcpServerTransport());
+IServer server = new Server();
+IServer server = new Server(new TcpServerTransport());
 ```
 
 Once you have your server instance you can start the server. Simply call the method `Start()`. Before starting your server remember to set the correct connection details on your transport. For more info see [transports](#transports).
@@ -73,8 +73,8 @@ server.CloseConnection(connectionId);
 To connect a client to a server you will first need a client instance. This is practically the same as for the server.
 
 ```c#
-Client client = new Client();
-Client client = new Client(new TcpClientTransport());
+IClient client = new Client();
+IClient client = new Client(new TcpClientTransport());
 ```
 
 Once you have your instance you can start connecting to a server. For this you can call the method `Connect()`. Before connecting the client remember to set the correct connection details on your transport. For more info see [transports](#transports).
@@ -89,7 +89,7 @@ client.Disconnect();
 The client also has an event which can be subscribed to for when this client gets disconnected either by disconnecting themself or getting disconnected by server.
 
 ```c#
-client.ConnectionClosed += OnConnectionClosed;
+client.ClientDisconnected += OnClientDisconnected;
 ```
 
 ## Running the update loop
@@ -97,11 +97,6 @@ client.ConnectionClosed += OnConnectionClosed;
 To make sure your peer is receiving all communications and managing all connections you have to consistently update the peer by calling the `Tick()` method. This goes for both server and client. It is recommended to call this method from the `FixedUpdate()` method on a MonoBehaviour or through a similar approach. This is because you don't want you communications to be framerate dependant.
 
 ## Creating messages
-
-The message side of this system is heavily based on my signals library and because of that the process is mostly similar except for a few small changes. For more info see [justinleemans/signals](https://github.com/justinleemans/signals).
-
-> [!NOTE]
-> In this library we use messages instead of signals. This is mostly a naming difference.
 
 To create a message we make a new class which inherits from the abstract class `Message`, this class is used for all message instances you will be sending and receiving. This class is also where you will define all fields/properties that you want to pass through.
 
@@ -241,23 +236,27 @@ transport.Port = 7777;
 
 If you want to implement your own transport there is a few things you will have to do. You can take a look at the included [Tcp transport](https://github.com/justinleemans/networking/tree/main/Runtime/Transports/Tcp) as an example.
 
-You will have to create a class implementing the `IServerTransport` interface for the server implementation. This will require you to implement 4 events, properties or methods.
-- `Action<Connection> NewConnection` which is an event that should be called when a new connection is made. Should return this new connection.
+You will have to create a class implementing the `IServerTransport` interface for the server implementation. This will require you to implement the following events, properties and/or methods.
+- `Action<int> ClientConnected` which is an event that should be called when a new connection is made. Should return an integer which represents the id of the connection.
+- `Action<int> ClientDisconnected` which is an event that should be called when a connection is closed. Should return the id of the connection that has been closed.
+- `bool IsRunning` which is a property that returns if the server is currently running.
+- `IReadOnlyCollection<int> ConnectionIds` which is a read only collection of all connection ids that are currently in use on the server.
 - `void Start()` which is to start the server.
 - `void Stop()` which is to stop the server.
+- `void CloseConnection(int connectionId)` which is a method that can be used to close a connection.
 - `void Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.
+- `void Send(Payload payload)` which takes an instance of payload to send to all connections.
+- `void Send(Payload payload, int connectionId)` which is the same method as before but send the payload to a specified connection.
+- `void Receive(Action<Payload, int> onMessageReceived)` which is called to check if a message can be received. Takes a callback method that should be called if a message has been received.
 
-Next you will have to create a class implementing the `IClientTransport` interface. This will also require you to implement 3 methods.
-- `Connection Connect(string remoteAddress, ushort port)` which is used to connect this client to a server. Should return an instance of Connection or null if failed to connect.
+Next you will have to create a class implementing the `IClientTransport` interface. This will require you to implement these events, properties and/or methods.
+- `Action ClientDisconnected` which is an event that should be raised when this client has been disconnected.
+- `bool IsConnected` which is a property which returns whether the client is currently connected to a server.
+- `void Connect()` which is used to connect this client to a server.
 - `void Disconnect()` which is to disconnect this client from the server.
 - `void Tick()` this method is the update loop for your transport, you will use this for checking wether you are able to receive a message.
-
-And lastly you will have to create a class deriving from `Connection`. This is the connection representing your peer.
-
-Next there is 3 methods you will have to implement.
-- `OnSend(byte[] dataBuffer)` which is used for sending the data. You get a byte array which you will have to send through your method of choice. Further manipulation of this byte array is generally not needed.
-- `OnReceive(out byte[] dataBuffer)` which is used to check if you have data that you can read. You will have to set the `dataBuffer` variable before exiting the method. If you don't have enough bytes for a full message or the data is not ready to be send through you can leave this at `null`. The `dataBuffer` will always come prefixed with a length int and a message id int. You have to read the length data and remove it before passing it on. You need to leave the message id in there.
-- `OnClose()` which will execute the code to close this connection.
+- `void Send(Payload payload)` which takes an instance of payload to send to the server.
+- `void Receive(Action<Payload, int> onMessageReceived)` which is called to check if a message can be received. Takes a callback method that should be called if a mesage has been received.
 
 # Logging
 
