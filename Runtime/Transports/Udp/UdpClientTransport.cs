@@ -5,7 +5,8 @@ namespace JeeLee.UniNetworking.Transports.Udp
 {
     public class UdpClientTransport : IClientTransport
     {
-        public event Action ClientDisconnected;
+        public Action ClientDisconnected { get; set; }
+        public Action<Payload, int> MessageReceived { get; set; }
 
         public bool IsConnected => throw new NotImplementedException();
 
@@ -25,11 +26,6 @@ namespace JeeLee.UniNetworking.Transports.Udp
         }
 
         public void Send(Payload payload)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Receive(Action<Payload, int> onMessageReceived)
         {
             throw new NotImplementedException();
         }

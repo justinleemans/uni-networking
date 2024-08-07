@@ -22,15 +22,15 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// Event triggered when a client disconnects from the server.
         /// </summary>
         public Action<int> ClientDisconnected { get; set; }
+
+        /// <summary>
+        /// Event triggered when the server receives a message from a client.
+        /// </summary>
+        public Action<Payload, int> MessageReceived { get; set; }
         
         private readonly Dictionary<int, TcpConnection> _connections = new Dictionary<int, TcpConnection>();
 
         private Socket _socket;
-
-        /// <summary>
-        /// Gets a value indicating whether the server transport is running.
-        /// </summary>
-        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Gets or sets the port on which the server listens for incoming connections.
@@ -47,28 +47,10 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Start()
         {
-            if (IsRunning)
-            {
-                NetworkLogger.Log("Server is already running", LogLevel.Warning);
-                return;
-            }
-
-            try
-            {
-                IPEndPoint localEndPoint = new IPEndPoint(IPAddress.IPv6Any, Port);
-                _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-                _socket.Bind(localEndPoint);
-                _socket.Listen(MaxConnections);
-
-                NetworkLogger.Log("Server started");
-                
-                IsRunning = true;
-            }
-            catch (Exception exception)
-            {
-                NetworkLogger.Log(exception, LogLevel.Error);
-                IsRunning = false;
-            }
+            IPEndPoint localEndPoint = new IPEndPoint(IPAddress.IPv6Any, Port);
+            _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            _socket.Bind(localEndPoint);
+            _socket.Listen(MaxConnections);
         }
 
         /// <summary>
@@ -76,11 +58,6 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Stop()
         {
-            if (!IsRunning)
-            {
-                return;
-            }
-            
             try
             {
                 var connectionIds = _connections.Keys.ToArray();
@@ -96,14 +73,9 @@ namespace JeeLee.UniNetworking.Transports.Tcp
                 
                 _socket.Shutdown(SocketShutdown.Both);
             }
-            catch (Exception exception)
-            {
-                NetworkLogger.Log(exception, LogLevel.Error);
-            }
             finally
             {
                 _socket.Close();
-                IsRunning = false;
             }
         }
 
@@ -127,14 +99,26 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Tick()
         {
-            if (!IsRunning)
-            {
-                return;
-            }
-
             if (_socket.Poll(0, SelectMode.SelectRead))
             {
                 OnNewConnection(_socket.Accept());
+            }
+
+            foreach (var connection in _connections)
+            {
+                connection.Value.Receive(payload =>
+                {
+                    switch (payload.Type)
+                    {
+                        case PayloadType.Message:
+                            MessageReceived(payload, connection.Key);
+                            break;
+                
+                        case PayloadType.Disconnect:
+                            connection.Value.Close();
+                            break;
+                    }
+                });
             }
         }
 
@@ -144,11 +128,6 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// <param name="payload">The payload to send.</param>
         public void Send(Payload payload)
         {
-            if (!IsRunning)
-            {
-                return;
-            }
-
             foreach (var connectionId in _connections.Keys)
             {
                 Send(payload, connectionId);
@@ -162,41 +141,12 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// <param name="connectionId">The connection identifier of the client.</param>
         public void Send(Payload payload, int connectionId)
         {
-            if (!IsRunning || !_connections.TryGetValue(connectionId, out var connection))
+            if (!_connections.TryGetValue(connectionId, out var connection))
             {
                 return;
             }
             
             connection.Send(payload);
-        }
-
-        /// <summary>
-        /// Receives payloads and processes them using the specified handler.
-        /// </summary>
-        /// <param name="onMessageReceived">The handler to process received payloads.</param>
-        public void Receive(Action<Payload, int> onMessageReceived)
-        {
-            if (!IsRunning)
-            {
-                return;
-            }
-            
-            foreach (var connection in _connections)
-            {
-                connection.Value.Receive(payload =>
-                {
-                    switch (payload.Type)
-                    {
-                        case PayloadType.Message:
-                            onMessageReceived(payload, connection.Key);
-                            break;
-                
-                        case PayloadType.Disconnect:
-                            connection.Value.Close();
-                            break;
-                    }
-                });
-            }
         }
 
         private void OnNewConnection(Socket socket)

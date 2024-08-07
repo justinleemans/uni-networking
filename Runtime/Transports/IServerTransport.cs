@@ -19,9 +19,9 @@ namespace JeeLee.UniNetworking.Transports
         Action<int> ClientDisconnected { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the server transport is running.
+        /// Event triggered when the server receives a message from a client.
         /// </summary>
-        bool IsRunning { get; }
+        Action<Payload, int> MessageReceived { get; set; }
 
         /// <summary>
         /// Starts the server transport to listen for incoming connections.
@@ -56,11 +56,5 @@ namespace JeeLee.UniNetworking.Transports
         /// <param name="payload">The payload to send.</param>
         /// <param name="connectionId">The connection identifier of the client.</param>
         void Send(Payload payload, int connectionId);
-
-        /// <summary>
-        /// Receives payloads and processes them using the specified handler.
-        /// </summary>
-        /// <param name="onMessageReceived">The handler to process received payloads.</param>
-        void Receive(Action<Payload, int> onMessageReceived);
     }
 }

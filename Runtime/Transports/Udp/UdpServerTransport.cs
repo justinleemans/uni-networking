@@ -7,6 +7,7 @@ namespace JeeLee.UniNetworking.Transports.Udp
     {
         public Func<int> ClientConnected { get; set; }
         public Action<int> ClientDisconnected { get; set; }
+        public Action<Payload, int> MessageReceived { get; set; }
 
         public bool IsRunning => throw new NotImplementedException();
 
@@ -40,11 +41,6 @@ namespace JeeLee.UniNetworking.Transports.Udp
         }
 
         public void Send(Payload payload, int connectionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Receive(Action<Payload, int> onMessageReceived)
         {
             throw new NotImplementedException();
         }

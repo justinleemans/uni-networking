@@ -33,7 +33,7 @@ namespace JeeLee.UniNetworking.Peers
         /// <summary>
         /// Gets a value indicating whether the server is running.
         /// </summary>
-        public bool IsRunning => _serverTransport.IsRunning;
+        public bool IsRunning { get; private set; }
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Server"/> class using the default TCP server transport.
@@ -51,8 +51,9 @@ namespace JeeLee.UniNetworking.Peers
         {
             _serverTransport = serverTransport;
 
-            _serverTransport.ClientConnected += OnClientConnected;
-            _serverTransport.ClientDisconnected += OnClientDisconnected;
+            _serverTransport.ClientConnected = OnClientConnected;
+            _serverTransport.ClientDisconnected = OnClientDisconnected;
+            _serverTransport.MessageReceived = OnMessageReceived;
         }
 
         /// <summary>
@@ -60,9 +61,24 @@ namespace JeeLee.UniNetworking.Peers
         /// </summary>
         public bool Start()
         {
-            _serverTransport.Start();
+            if (IsRunning)
+            {
+                NetworkLogger.Log("Server is already running", LogLevel.Warning);
+                return IsRunning = true;
+            }
 
-            return IsRunning;
+            try
+            {
+                _serverTransport.Start();
+                NetworkLogger.Log("Server started");
+                
+                return IsRunning = true;
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+                return IsRunning = false;
+            }
         }
 
         /// <summary>
@@ -70,7 +86,20 @@ namespace JeeLee.UniNetworking.Peers
         /// </summary>
         public void Stop()
         {
-            _serverTransport.Stop();
+            if (!IsRunning)
+            {
+                return;
+            }
+            
+            try
+            {
+                _serverTransport.Stop();
+                IsRunning = false;
+            }
+            catch (Exception exception)
+            {
+                NetworkLogger.Log(exception, LogLevel.Error);
+            }
         }
 
         /// <summary>
@@ -98,7 +127,6 @@ namespace JeeLee.UniNetworking.Peers
             }
             
             _serverTransport.Tick();
-            _serverTransport.Receive(OnMessageReceived);
         }
 
         /// <summary>
@@ -132,6 +160,11 @@ namespace JeeLee.UniNetworking.Peers
         {
             try
             {
+                if (!IsRunning)
+                {
+                    return;
+                }
+                
                 short messageId = _messageRegistry.RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
             
@@ -144,8 +177,10 @@ namespace JeeLee.UniNetworking.Peers
             {
                 NetworkLogger.Log(exception, LogLevel.Error);
             }
-
-            _messageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
+            finally
+            {
+                _messageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
+            }
         }
 
         /// <summary>
@@ -159,6 +194,11 @@ namespace JeeLee.UniNetworking.Peers
         {
             try
             {
+                if (!IsRunning)
+                {
+                    return;
+                }
+                
                 short messageId = _messageRegistry.RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
 
@@ -171,8 +211,10 @@ namespace JeeLee.UniNetworking.Peers
             {
                 NetworkLogger.Log(exception, LogLevel.Error);
             }
-
-            _messageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
+            finally
+            {
+                _messageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
+            }
         }
 
         /// <summary>
@@ -230,16 +272,6 @@ namespace JeeLee.UniNetworking.Peers
             _messageRegistry.AllocateMessageBroker<TMessage>()?.RemoveHandler(handler);
         }
 
-        private void OnMessageReceived(Payload payload, int connectionId)
-        {
-            if (!_messageRegistry.MessageBrokers.TryGetValue(payload.MessageId, out var registry))
-            {
-                return;
-            }
-
-            registry.Handle(connectionId, payload);
-        }
-
         private int OnClientConnected()
         {
             int newConnectionId = GetConnectionId();
@@ -252,6 +284,16 @@ namespace JeeLee.UniNetworking.Peers
         {
             _idPool.Enqueue(connectionId);
             ClientDisconnected?.Invoke(connectionId);
+        }
+
+        private void OnMessageReceived(Payload payload, int connectionId)
+        {
+            if (!_messageRegistry.MessageBrokers.TryGetValue(payload.MessageId, out var registry))
+            {
+                return;
+            }
+
+            registry.Handle(connectionId, payload);
         }
 
         private int GetConnectionId()

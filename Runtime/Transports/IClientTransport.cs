@@ -11,12 +11,12 @@ namespace JeeLee.UniNetworking.Transports
         /// <summary>
         /// Event triggered when the client disconnects from the server.
         /// </summary>
-        event Action ClientDisconnected;
+        Action ClientDisconnected { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the client is currently connected to a server.
+        /// Event triggered when the client receives a message from the server.
         /// </summary>
-        bool IsConnected { get; }
+        Action<Payload, int> MessageReceived { get; set; }
         
         /// <summary>
         /// Establishes a connection to a remote server.
@@ -38,11 +38,5 @@ namespace JeeLee.UniNetworking.Transports
         /// </summary>
         /// <param name="payload">The payload to send.</param>
         void Send(Payload payload);
-
-        /// <summary>
-        /// Receives payloads from the server and processes them using the specified handler.
-        /// </summary>
-        /// <param name="onMessageReceived">The handler to process received payloads.</param>
-        void Receive(Action<Payload, int> onMessageReceived);
     }
 }

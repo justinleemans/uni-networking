@@ -14,14 +14,14 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// <summary>
         /// Event triggered when the client disconnects from the server.
         /// </summary>
-        public event Action ClientDisconnected;
-
-        private TcpConnection _connection;
+        public Action ClientDisconnected { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the client is currently connected to a server.
+        /// Event triggered when the client receives a message from the server.
         /// </summary>
-        public bool IsConnected { get; private set; }
+        public Action<Payload, int> MessageReceived { get; set; }
+
+        private TcpConnection _connection;
 
         /// <summary>
         /// Gets or sets the IP address of the remote server to connect to.
@@ -38,11 +38,6 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Connect()
         {
-            if (IsConnected)
-            {
-                Disconnect();
-            }
-
             IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Parse(IpAddress), Port);
             Socket socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             
@@ -51,18 +46,11 @@ namespace JeeLee.UniNetworking.Transports.Tcp
             _connection = new TcpConnection(socket);
             _connection.ConnectionClosed += HandleConnectionClosed;
 
-            NetworkLogger.Log("Client connected");
-            
-            IsConnected = true;
-
             void HandleConnectionClosed()
             {
                 _connection.ConnectionClosed -= HandleConnectionClosed;
                 
                 _connection = null;
-                IsConnected = false;
-                
-                NetworkLogger.Log("Client disconnected");
                 
                 ClientDisconnected?.Invoke();
             }
@@ -73,11 +61,6 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Disconnect()
         {
-            if (!IsConnected)
-            {
-                return;
-            }
-
             Send(new Payload(PayloadType.Disconnect));
             _connection.Close();
         }
@@ -87,7 +70,19 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// </summary>
         public void Tick()
         {
-            // Implementation for disconnecting, if necessary.
+            _connection.Receive(payload =>
+            {
+                switch (payload.Type)
+                {
+                    case PayloadType.Message:
+                        MessageReceived(payload, -1);
+                        break;
+                
+                    case PayloadType.Disconnect:
+                        _connection.Close();
+                        break;
+                }
+            });
         }
 
         /// <summary>
@@ -96,38 +91,7 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// <param name="payload">The payload to send.</param>
         public void Send(Payload payload)
         {
-            if (!IsConnected)
-            {
-                return;
-            }
-            
             _connection.Send(payload);
-        }
-
-        /// <summary>
-        /// Receives payloads from the server and processes them using the specified handler.
-        /// </summary>
-        /// <param name="onMessageReceived">The handler to process received payloads.</param>
-        public void Receive(Action<Payload, int> onMessageReceived)
-        {
-            if (!IsConnected)
-            {
-                return;
-            }
-            
-            _connection.Receive(payload =>
-            {
-                switch (payload.Type)
-                {
-                    case PayloadType.Message:
-                        onMessageReceived(payload, -1);
-                        break;
-                
-                    case PayloadType.Disconnect:
-                        _connection.Close();
-                        break;
-                }
-            });
         }
     }
 }

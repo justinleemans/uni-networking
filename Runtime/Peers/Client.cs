@@ -16,11 +16,7 @@ namespace JeeLee.UniNetworking.Peers
         /// <summary>
         /// Event triggered when this client gets disconnected.
         /// </summary>
-        public event Action ClientDisconnected
-        {
-            add => _clientTransport.ClientDisconnected += value;
-            remove => _clientTransport.ClientDisconnected -= value;
-        }
+        public event Action ClientDisconnected;
 
         private readonly IMessageRegistry _messageRegistry = new MessageRegistry();
         private readonly IClientTransport _clientTransport;
@@ -28,7 +24,7 @@ namespace JeeLee.UniNetworking.Peers
         /// <summary>
         /// Gets a value indicating whether the client is currently connected to a server.
         /// </summary>
-        public bool IsConnected => _clientTransport.IsConnected;
+        public bool IsConnected { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Client"/> class using the default TCP client transport.
@@ -45,6 +41,9 @@ namespace JeeLee.UniNetworking.Peers
         public Client(IClientTransport clientTransport)
         {
             _clientTransport = clientTransport;
+
+            _clientTransport.ClientDisconnected = OnClientDisconnected;
+            _clientTransport.MessageReceived = OnMessageReceived;
         }
 
         /// <summary>
@@ -52,9 +51,16 @@ namespace JeeLee.UniNetworking.Peers
         /// </summary>
         public bool Connect()
         {
+            if (IsConnected)
+            {
+                _clientTransport.Disconnect();
+            }
+            
             _clientTransport.Connect();
 
-            return IsConnected;
+            NetworkLogger.Log("Client connected");
+
+            return IsConnected = true;
         }
 
         /// <summary>
@@ -62,6 +68,11 @@ namespace JeeLee.UniNetworking.Peers
         /// </summary>
         public void Disconnect()
         {
+            if (!IsConnected)
+            {
+                return;
+            }
+            
             _clientTransport.Disconnect();
         }
         
@@ -76,7 +87,6 @@ namespace JeeLee.UniNetworking.Peers
             }
             
             _clientTransport.Tick();
-            _clientTransport.Receive(OnMessageReceived);
         }
 
         /// <summary>
@@ -99,6 +109,11 @@ namespace JeeLee.UniNetworking.Peers
         {
             try
             {
+                if (!IsConnected)
+                {
+                    return;
+                }
+                
                 short messageId = _messageRegistry.RegisterMessageId<TMessage>();
                 Payload payload = message.Serialize(messageId);
             
@@ -111,8 +126,10 @@ namespace JeeLee.UniNetworking.Peers
             {
                 NetworkLogger.Log(exception, LogLevel.Error);
             }
-
-            _messageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
+            finally
+            {
+                _messageRegistry.AllocateMessageBroker<TMessage>()?.ReleaseMessage(message);
+            }
         }
 
         /// <summary>
@@ -146,6 +163,15 @@ namespace JeeLee.UniNetworking.Peers
             where TMessage : Message
         {
             _messageRegistry.AllocateMessageBroker<TMessage>()?.RemoveHandler(handler);
+        }
+
+        private void OnClientDisconnected()
+        {
+            IsConnected = false;
+            
+            NetworkLogger.Log("Client disconnected");
+
+            ClientDisconnected?.Invoke();
         }
         
         private void OnMessageReceived(Payload payload, int connectionId)
