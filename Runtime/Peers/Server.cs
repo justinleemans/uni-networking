@@ -17,33 +17,23 @@ namespace JeeLee.UniNetworking.Peers
         /// <summary>
         /// Event triggered when a client connects to the server.
         /// </summary>
-        public event Action<int> ClientConnected
-        {
-            add => _serverTransport.ClientConnected += value;
-            remove => _serverTransport.ClientConnected -= value;
-        }
+        public event Action<int> ClientConnected;
         
         /// <summary>
         /// Event triggered when a client disconnects from the server.
         /// </summary>
-        public event Action<int> ClientDisconnected
-        {
-            add => _serverTransport.ClientDisconnected += value;
-            remove => _serverTransport.ClientDisconnected -= value;
-        }
+        public event Action<int> ClientDisconnected;
 
         private readonly IMessageRegistry _messageRegistry = new MessageRegistry();
         private readonly IServerTransport _serverTransport;
+        private readonly Queue<int> _idPool = new Queue<int>();
+
+        private int _lastUserId;
 
         /// <summary>
         /// Gets a value indicating whether the server is running.
         /// </summary>
         public bool IsRunning => _serverTransport.IsRunning;
-
-        /// <summary>
-        /// Gets all connection ids currently in use.
-        /// </summary>
-        public IReadOnlyCollection<int> ConnectionIds => _serverTransport.ConnectionIds;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="Server"/> class using the default TCP server transport.
@@ -60,6 +50,9 @@ namespace JeeLee.UniNetworking.Peers
         public Server(IServerTransport serverTransport)
         {
             _serverTransport = serverTransport;
+
+            _serverTransport.ClientConnected += OnClientConnected;
+            _serverTransport.ClientDisconnected += OnClientDisconnected;
         }
 
         /// <summary>
@@ -245,6 +238,30 @@ namespace JeeLee.UniNetworking.Peers
             }
 
             registry.Handle(connectionId, payload);
+        }
+
+        private int OnClientConnected()
+        {
+            int newConnectionId = GetConnectionId();
+            ClientConnected?.Invoke(newConnectionId);
+
+            return newConnectionId;
+        }
+
+        private void OnClientDisconnected(int connectionId)
+        {
+            _idPool.Enqueue(connectionId);
+            ClientDisconnected?.Invoke(connectionId);
+        }
+
+        private int GetConnectionId()
+        {
+            if (_idPool.Count > 0)
+            {
+                return _idPool.Dequeue();
+            }
+
+            return ++_lastUserId;
         }
     }
 }

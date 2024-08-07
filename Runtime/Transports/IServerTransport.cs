@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using JeeLee.UniNetworking.Payloads;
 
 namespace JeeLee.UniNetworking.Transports
@@ -12,22 +11,17 @@ namespace JeeLee.UniNetworking.Transports
         /// <summary>
         /// Event triggered when a client connects to the server.
         /// </summary>
-        event Action<int> ClientConnected;
+        Func<int> ClientConnected { get; set; }
 
         /// <summary>
         /// Event triggered when a client disconnects from the server.
         /// </summary>
-        event Action<int> ClientDisconnected;
+        Action<int> ClientDisconnected { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the server transport is running.
         /// </summary>
         bool IsRunning { get; }
-
-        /// <summary>
-        /// Gets the collection of connection identifiers.
-        /// </summary>
-        IReadOnlyCollection<int> ConnectionIds { get; }
 
         /// <summary>
         /// Starts the server transport to listen for incoming connections.

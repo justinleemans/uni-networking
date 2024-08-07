@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using JeeLee.UniNetworking.Messages;
 
 namespace JeeLee.UniNetworking.Peers
@@ -23,11 +22,6 @@ namespace JeeLee.UniNetworking.Peers
         /// Gets a value indicating whether the server is running.
         /// </summary>
         bool IsRunning { get; }
-
-        /// <summary>
-        /// Gets all connection ids currently in use.
-        /// </summary>
-        public IReadOnlyCollection<int> ConnectionIds { get; }
         
         /// <summary>
         /// Starts the server.

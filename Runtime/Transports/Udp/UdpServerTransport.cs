@@ -1,17 +1,14 @@
 using System;
-using System.Collections.Generic;
 using JeeLee.UniNetworking.Payloads;
 
 namespace JeeLee.UniNetworking.Transports.Udp
 {
     public class UdpServerTransport : IServerTransport
     {
-        public event Action<int> ClientConnected;
-        public event Action<int> ClientDisconnected;
+        public Func<int> ClientConnected { get; set; }
+        public Action<int> ClientDisconnected { get; set; }
 
         public bool IsRunning => throw new NotImplementedException();
-
-        public IReadOnlyCollection<int> ConnectionIds => throw new NotImplementedException();
 
         public ushort Port { get; set; } = 7777;
         

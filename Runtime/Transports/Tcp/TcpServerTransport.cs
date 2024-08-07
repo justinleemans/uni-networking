@@ -16,28 +16,21 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         /// <summary>
         /// Event triggered when a client connects to the server.
         /// </summary>
-        public event Action<int> ClientConnected;
+        public Func<int> ClientConnected { get; set; }
 
         /// <summary>
         /// Event triggered when a client disconnects from the server.
         /// </summary>
-        public event Action<int> ClientDisconnected;
+        public Action<int> ClientDisconnected { get; set; }
         
-        private readonly Queue<int> _idPool = new Queue<int>();
         private readonly Dictionary<int, TcpConnection> _connections = new Dictionary<int, TcpConnection>();
 
         private Socket _socket;
-        private int _lastUserId;
 
         /// <summary>
         /// Gets a value indicating whether the server transport is running.
         /// </summary>
         public bool IsRunning { get; private set; }
-
-        /// <summary>
-        /// Gets the collection of connection identifiers.
-        /// </summary>
-        public IReadOnlyCollection<int> ConnectionIds => _connections.Keys;
 
         /// <summary>
         /// Gets or sets the port on which the server listens for incoming connections.
@@ -97,9 +90,7 @@ namespace JeeLee.UniNetworking.Transports.Tcp
                     CloseConnection(connectionId);
                 }
 
-                _idPool.Clear();
                 _connections.Clear();
-                _lastUserId = 0;
                 
                 NetworkLogger.Log("Server stopped");
                 
@@ -108,10 +99,10 @@ namespace JeeLee.UniNetworking.Transports.Tcp
             catch (Exception exception)
             {
                 NetworkLogger.Log(exception, LogLevel.Error);
-                _socket.Close();
             }
             finally
             {
+                _socket.Close();
                 IsRunning = false;
             }
         }
@@ -211,33 +202,20 @@ namespace JeeLee.UniNetworking.Transports.Tcp
         private void OnNewConnection(Socket socket)
         {
             var connection = new TcpConnection(socket);
-            int connectionId = GetConnectionId();
             
-            connection.ConnectionClosed += HandleConnectionClosed;
+            int connectionId = ClientConnected();
             _connections.Add(connectionId, connection);
-            ClientConnected?.Invoke(connectionId);
+
+            connection.ConnectionClosed += HandleConnectionClosed;
 
             void HandleConnectionClosed()
             {
                 connection.ConnectionClosed -= HandleConnectionClosed;
 
-                if (_connections.Remove(connectionId))
-                {
-                    _idPool.Enqueue(connectionId);
-                }
-            
+                _connections.Remove(connectionId);
+
                 ClientDisconnected?.Invoke(connectionId);
             }
-        }
-
-        private int GetConnectionId()
-        {
-            if (_idPool.Count > 0)
-            {
-                return _idPool.Dequeue();
-            }
-
-            return ++_lastUserId;
         }
     }
 }
