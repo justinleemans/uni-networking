@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using JeeLee.UniNetworking.Logging;
 using JeeLee.UniNetworking.Payloads;
 
 namespace JeeLee.UniNetworking.Transports.Tcp
@@ -68,8 +67,6 @@ namespace JeeLee.UniNetworking.Transports.Tcp
                 }
 
                 _connections.Clear();
-                
-                NetworkLogger.Log("Server stopped");
                 
                 _socket.Shutdown(SocketShutdown.Both);
             }

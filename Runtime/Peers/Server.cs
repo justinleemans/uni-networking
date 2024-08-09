@@ -94,6 +94,8 @@ namespace JeeLee.UniNetworking.Peers
             try
             {
                 _serverTransport.Stop();
+                NetworkLogger.Log("Server stopped");
+
                 IsRunning = false;
             }
             catch (Exception exception)
