@@ -276,16 +276,20 @@ namespace JeeLee.UniNetworking.Peers
 
         private int OnClientConnected()
         {
-            int newConnectionId = GetConnectionId();
-            ClientConnected?.Invoke(newConnectionId);
+            int connectionId = GetConnectionId();
+            ClientConnected?.Invoke(connectionId);
 
-            return newConnectionId;
+            NetworkLogger.Log($"New client connected to server with id {connectionId}");
+
+            return connectionId;
         }
 
         private void OnClientDisconnected(int connectionId)
         {
             _idPool.Enqueue(connectionId);
             ClientDisconnected?.Invoke(connectionId);
+
+            NetworkLogger.Log($"Client with id {connectionId} disconnected");
         }
 
         private void OnMessageReceived(Payload payload, int connectionId)
